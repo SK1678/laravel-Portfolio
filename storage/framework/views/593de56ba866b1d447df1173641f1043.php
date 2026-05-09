@@ -23,6 +23,9 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
     <link rel="stylesheet" href="<?php echo e(asset('/dashboard_assets/css/style.css')); ?>">
+    
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <!-- ApexCharts CDN -->
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
@@ -121,8 +124,8 @@
             </li>
             <!-- Dropdown -->
             <li class="ms-3">
-                <img src="<?php echo e(Auth::user()->profile_image ? asset('storage/' . Auth::user()->profile_image) : asset('/dashboard_assets/images/avatar/avatar-1.jpg')); ?>" alt=""
-                    class="avatar avatar-sm rounded-circle" />
+                <img src="<?php echo e(Auth::user()->profile_image ? asset('storage/' . Auth::user()->profile_image) : asset('/dashboard_assets/images/avatar/avatar-1.jpg')); ?>"
+                    alt="" class="avatar avatar-sm rounded-circle" />
             </li>
         </ul>
     </div>
@@ -147,17 +150,18 @@
         <li><a class="nav-link <?php echo e((request()->routeIs('dashboard') || request()->is('dashboard*')) ? 'active' : ''); ?>"
                 href="<?php echo e(route('dashboard')); ?>"><i class="ti ti-home"></i><span class="nav-text">Dashboard</span></a>
         </li>
-        <li><a class="nav-link" href="inventory.html"><i class="ti ti-settings"></i><span class="nav-text">Global
+        <li><a class="nav-link <?php echo e((request()->routeIs('settings.global') || request()->is('settings/global*')) ? 'active' : ''); ?>"
+                href="<?php echo e(route('settings.global')); ?>"><i class="ti ti-settings"></i><span class="nav-text">Global
                     Settings</span></a></li>
-        <li><a class="nav-link" href="create-product.html"><i class="ti ti-layout-dashboard"></i><span
-                    class="nav-text">Page Configurations</span></a></li>
-        <li><a class="nav-link" href="reports.html"><i class="ti ti-receipt"></i><span
+        <li><a class="nav-link <?php echo e((request()->routeIs('page') || request()->is('page*')) ? 'active' : ''); ?>"
+                href="<?php echo e(route('page')); ?>"><i class="ti ti-layout-dashboard"></i><span class="nav-text">Page
+                    Configurations</span></a></li>
+        <li><a class="nav-link <?php echo e(request()->routeIs('admin.portfolio') ? 'active' : ''); ?>"
+                href="<?php echo e(route('admin.portfolio')); ?>"><i class="ti ti-receipt"></i><span
                     class="nav-text">Portfolio</span></a>
         </li>
-        <li><a class="nav-link" href="404-error.html"><i class="ti ti-alert-circle"></i><span
-                    class="nav-text">Skills</span></a>
-        </li>
-        <li><a class="nav-link" href="docs.html"><i class="ti ti-file-text"></i><span
+        <li><a class="nav-link <?php echo e(request()->routeIs('admin.messages') ? 'active' : ''); ?>"
+                href="<?php echo e(route('admin.messages')); ?>"><i class="ti ti-file-text"></i><span
                     class="nav-text">Messages</span></a>
         </li>
 

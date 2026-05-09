@@ -4,13 +4,18 @@
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>Index - Kelly Bootstrap Template</title>
-    <meta name="description" content="">
-    <meta name="keywords" content="">
+    <title><?php echo e($siteSettings->site_title ?? 'Lavender Portfolio'); ?></title>
+    <meta name="description" content="<?php echo e($siteSettings->meta_description ?? ''); ?>">
+    <meta name="keywords" content="<?php echo e($siteSettings->meta_keywords ?? ''); ?>">
 
     <!-- Favicons -->
-    <link href="<?php echo e(asset('UI/assets/img/favicon.png')); ?>" rel="icon">
-    <link href="<?php echo e(asset('UI/assets/img/apple-touch-icon.png')); ?>" rel="apple-touch-icon">
+    <?php if(isset($siteSettings) && $siteSettings->favicon): ?>
+        <link href="<?php echo e(asset('storage/' . $siteSettings->favicon)); ?>" rel="icon">
+        <link href="<?php echo e(asset('storage/' . $siteSettings->favicon)); ?>" rel="apple-touch-icon">
+    <?php else: ?>
+        <link href="<?php echo e(asset('UI/assets/img/favicon.png')); ?>" rel="icon">
+        <link href="<?php echo e(asset('UI/assets/img/apple-touch-icon.png')); ?>" rel="apple-touch-icon">
+    <?php endif; ?>
 
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com" rel="preconnect">
@@ -25,9 +30,118 @@
     <link href="<?php echo e(asset('UI/assets/vendor/aos/aos.css')); ?>" rel="stylesheet">
     <link href="<?php echo e(asset('UI/assets/vendor/swiper/swiper-bundle.min.css')); ?>" rel="stylesheet">
     <link href="<?php echo e(asset('UI/assets/vendor/glightbox/css/glightbox.min.css')); ?>" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <!-- Main CSS File -->
     <link href="<?php echo e(asset('UI/assets/css/main.css')); ?>" rel="stylesheet">
+
+    <!-- Dynamic Custom Colors -->
+    <style>
+        :root {
+            --default-font: "<?php echo e($siteSettings->default_font ?? 'Poppins'); ?>", sans-serif;
+            --heading-font: "<?php echo e($siteSettings->heading_font ?? 'Outfit'); ?>", sans-serif;
+            
+            --background-color: <?php echo e($siteSettings->body_bg ?? '#ffffff'); ?>;
+            --default-color: <?php echo e($siteSettings->primary_color ?? '#444444'); ?>;
+            --heading-color: <?php echo e($siteSettings->heading_color ?? '#222222'); ?>;
+            --accent-color: <?php echo e($siteSettings->accent_color ?? '#34b7a7'); ?>;
+            --surface-color: <?php echo e($siteSettings->surface_color ?? '#ffffff'); ?>;
+            --contrast-color: <?php echo e($siteSettings->contrast_color ?? '#ffffff'); ?>;
+
+            --nav-color: <?php echo e($siteSettings->nav_primary ?? '#444444'); ?>;
+            --nav-hover-color: <?php echo e($siteSettings->nav_hover ?? '#34b7a7'); ?>;
+            --nav-mobile-background-color: <?php echo e($siteSettings->nav_mobile_bg ?? '#ffffff'); ?>;
+            --nav-dropdown-background-color: <?php echo e($siteSettings->nav_dd_bg ?? '#ffffff'); ?>;
+            --nav-dropdown-color: <?php echo e($siteSettings->nav_dd_link ?? '#444444'); ?>;
+            --nav-dropdown-hover-color: <?php echo e($siteSettings->nav_dd_hover ?? '#34b7a7'); ?>;
+        }
+
+        <?php if(isset($siteSettings) && $siteSettings->is_dark_mode): ?>
+        /* =============================================
+           SITE-WIDE DARK MODE — Applied from settings
+           ============================================= */
+        :root,
+        body,
+        .light-background,
+        .dark-background {
+            --background-color: <?php echo e($siteSettings->dark_body_bg ?? '#060606'); ?>;
+            --default-color: <?php echo e($siteSettings->dark_primary_color ?? '#ffffff'); ?>;
+            --heading-color: <?php echo e($siteSettings->dark_heading_color ?? '#ffffff'); ?>;
+            --accent-color: <?php echo e($siteSettings->dark_accent_color ?? '#34b7a7'); ?>;
+            --surface-color: <?php echo e($siteSettings->dark_surface_color ?? '#252525'); ?>;
+            --contrast-color: <?php echo e($siteSettings->dark_contrast_color ?? '#ffffff'); ?>;
+            --nav-color: <?php echo e($siteSettings->dark_primary_color ?? '#ffffff'); ?>;
+            --nav-hover-color: <?php echo e($siteSettings->dark_accent_color ?? '#34b7a7'); ?>;
+            --nav-mobile-background-color: <?php echo e($siteSettings->dark_body_bg ?? '#060606'); ?>;
+            --nav-dropdown-background-color: <?php echo e($siteSettings->dark_surface_color ?? '#252525'); ?>;
+            --nav-dropdown-color: <?php echo e($siteSettings->dark_primary_color ?? '#ffffff'); ?>;
+            --nav-dropdown-hover-color: <?php echo e($siteSettings->dark_accent_color ?? '#34b7a7'); ?>;
+        }
+
+        body {
+            background-color: <?php echo e($siteSettings->dark_body_bg ?? '#060606'); ?> !important;
+            color: <?php echo e($siteSettings->dark_primary_color ?? '#ffffff'); ?> !important;
+        }
+
+        /* Header & Nav */
+        .header,
+        .navmenu,
+        .sticky-top {
+            background-color: <?php echo e($siteSettings->dark_surface_color ?? '#252525'); ?> !important;
+            border-color: rgba(255,255,255,0.08) !important;
+        }
+
+        /* Light background sections → dark surface */
+        .light-background {
+            background-color: <?php echo e($siteSettings->dark_surface_color ?? '#252525'); ?> !important;
+        }
+
+        /* Footer */
+        .footer {
+            background-color: <?php echo e($siteSettings->dark_surface_color ?? '#252525'); ?> !important;
+            color: <?php echo e($siteSettings->dark_primary_color ?? '#ffffff'); ?> !important;
+        }
+
+        /* Cards, inputs, form controls */
+        .card,
+        .form-control,
+        .form-select,
+        input, textarea, select {
+            background-color: <?php echo e($siteSettings->dark_surface_color ?? '#252525'); ?> !important;
+            color: <?php echo e($siteSettings->dark_primary_color ?? '#ffffff'); ?> !important;
+            border-color: rgba(255,255,255,0.12) !important;
+        }
+
+        /* Sitename / logo text */
+        .sitename {
+            color: <?php echo e($siteSettings->dark_heading_color ?? '#ffffff'); ?> !important;
+        }
+
+        /* Links */
+        a {
+            color: <?php echo e($siteSettings->dark_accent_color ?? '#34b7a7'); ?>;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar-track { background: <?php echo e($siteSettings->dark_body_bg ?? '#060606'); ?>; }
+        ::-webkit-scrollbar-thumb { background: <?php echo e($siteSettings->dark_surface_color ?? '#252525'); ?>; }
+        <?php endif; ?>
+    </style>
+
+    <?php if(isset($siteSettings) && $siteSettings->google_analytics_id): ?>
+        <!-- Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=<?php echo e($siteSettings->google_analytics_id); ?>"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '<?php echo e($siteSettings->google_analytics_id); ?>');
+        </script>
+    <?php endif; ?>
+
+    <?php if(isset($siteSettings) && !$siteSettings->allow_indexing): ?>
+        <meta name="robots" content="noindex, nofollow">
+    <?php endif; ?>
 
     <!-- =======================================================
   * Template Name: Kelly

@@ -254,6 +254,12 @@
                                                     class="form-control form-control-sm shadow-none" placeholder="e.g. 2022"
                                                     value="{{ $item['year'] ?? '' }}">
                                             </div>
+                                            <div class="col-12">
+                                                <label class="form-label extra-small fw-bold">Description</label>
+                                                <textarea name="education_info[{{ $index }}][description]"
+                                                    class="form-control form-control-sm shadow-none" rows="2"
+                                                    placeholder="Briefly describe your course or achievements...">{{ $item['description'] ?? '' }}</textarea>
+                                            </div>
                                         </div>
 
                                         <!-- Document Vault for this Education -->
@@ -461,6 +467,7 @@
                                                                                                 <div class="col-md-3"><label class="form-label extra-small fw-bold">Duration</label><input type="text" name="education_info[${index}][duration]" class="form-control form-control-sm shadow-none" placeholder="Duration"></div>
                                                                                                 <div class="col-md-3"><label class="form-label extra-small fw-bold">Result</label><input type="text" name="education_info[${index}][result]" class="form-control form-control-sm shadow-none" placeholder="Result"></div>
                                                                                                 <div class="col-md-3"><label class="form-label extra-small fw-bold">Passing Year</label><input type="text" name="education_info[${index}][year]" class="form-control form-control-sm shadow-none" placeholder="Year"></div>
+                                                                                                <div class="col-12"><label class="form-label extra-small fw-bold">Description</label><textarea name="education_info[${index}][description]" class="form-control form-control-sm shadow-none" rows="2" placeholder="Responsibilities..."></textarea></div>
                                                                                             </div>
                                                                                             <div class="document-vault mt-3 pt-3 border-top">
                                                                                                 <div class="d-flex justify-content-between align-items-center mb-2">

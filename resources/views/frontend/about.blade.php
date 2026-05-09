@@ -1,55 +1,8 @@
 @include('frontend.include.head')
 
-<body class="about-page">
+<body class="about-page{{ (isset($siteSettings) && $siteSettings->is_dark_mode) ? ' dark-background' : '' }}">
 
-  <header id="header" class="header d-flex align-items-center light-background sticky-top">
-    <div class="container-fluid position-relative d-flex align-items-center justify-content-between">
-
-      <a href="{{ route('home') }}" class="logo d-flex align-items-center me-auto me-xl-0">
-        <!-- Uncomment the line below if you also wish to use an image logo -->
-        <!-- <img src="assets/img/logo.png" alt=""> -->
-        <h1 class="sitename">Kelly</h1>
-      </a>
-
-      <nav id="navmenu" class="navmenu">
-        <ul>
-          <li><a href="{{route('home')}}">Home</a></li>
-          <li><a href="{{ route('about') }}" class="active">About</a></li>
-          <li><a href="resume.html">Resume</a></li>
-          <li><a href="services.html">Services</a></li>
-          <li><a href="portfolio.html">Portfolio</a></li>
-          <li class="dropdown"><a href="#"><span>Dropdown</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
-            <ul>
-              <li><a href="#">Dropdown 1</a></li>
-              <li class="dropdown"><a href="#"><span>Deep Dropdown</span> <i
-                    class="bi bi-chevron-down toggle-dropdown"></i></a>
-                <ul>
-                  <li><a href="#">Deep Dropdown 1</a></li>
-                  <li><a href="#">Deep Dropdown 2</a></li>
-                  <li><a href="#">Deep Dropdown 3</a></li>
-                  <li><a href="#">Deep Dropdown 4</a></li>
-                  <li><a href="#">Deep Dropdown 5</a></li>
-                </ul>
-              </li>
-              <li><a href="#">Dropdown 2</a></li>
-              <li><a href="#">Dropdown 3</a></li>
-              <li><a href="#">Dropdown 4</a></li>
-            </ul>
-          </li>
-          <li><a href="contact.html">Contact</a></li>
-        </ul>
-        <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
-      </nav>
-
-      <div class="header-social-links">
-        <a href="#" class="twitter"><i class="bi bi-twitter-x"></i></a>
-        <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>
-        <a href="#" class="instagram"><i class="bi bi-instagram"></i></a>
-        <a href="#" class="linkedin"><i class="bi bi-linkedin"></i></a>
-      </div>
-
-    </div>
-  </header>
+  @include('frontend.include.header')
 
   <main class="main">
 
@@ -58,46 +11,59 @@
 
       <!-- Section Title -->
       <div class="container section-title" data-aos="fade-up">
-        <h2>About</h2>
-        <p>Necessitatibus eius consequatur ex aliquid fuga eum quidem sint consectetur velit</p>
+        <h2>{{ $about->title ?? 'About' }}</h2>
+        @if($about->subtitle)
+          <p>{{ $about->subtitle }}</p>
+        @endif
       </div><!-- End Section Title -->
 
       <div class="container" data-aos="fade-up" data-aos-delay="100">
 
         <div class="row gy-4 justify-content-center">
-          <div class="col-lg-4">
-            <img src="{{ asset('UI/assets/img/profile-img.jpg') }}" class="img-fluid" alt="">
+          <style>
+            .about-profile-img {
+              width: 100%;
+              aspect-ratio: 1 / 1;
+              object-fit: contain;
+              object-position: center;
+              background: #f8f9fa;
+              border-radius: 10px;
+              display: block;
+              box-shadow: none !important;
+            }
+          </style>
+
+          <div class="col-lg-3">
+            <img
+              src="{{ ($about && $about->image_path) ? asset('storage/' . $about->image_path) : (($siteOwner && $siteOwner->profile_image) ? asset('storage/' . $siteOwner->profile_image) : asset('UI/assets/img/profile-img.jpg')) }}"
+              class="img-fluid rounded about-profile-img" alt="Profile Image">
           </div>
-          <div class="col-lg-8 content">
-            <h2>UI/UX Designer &amp; Web Developer.</h2>
-            <p class="fst-italic py-3">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
-              dolore
-              magna aliqua.
-            </p>
-            <div class="row">
-              <div class="col-lg-6">
-                <ul>
-                  <li><i class="bi bi-chevron-right"></i> <strong>Birthday:</strong> <span>1 May 1995</span></li>
-                  <li><i class="bi bi-chevron-right"></i> <strong>Website:</strong> <span>www.example.com</span></li>
-                  <li><i class="bi bi-chevron-right"></i> <strong>Phone:</strong> <span>+123 456 7890</span></li>
-                  <li><i class="bi bi-chevron-right"></i> <strong>City:</strong> <span>New York, USA</span></li>
-                </ul>
-              </div>
-              <div class="col-lg-6">
-                <ul>
-                  <li><i class="bi bi-chevron-right"></i> <strong>Age:</strong> <span>30</span></li>
-                  <li><i class="bi bi-chevron-right"></i> <strong>Degree:</strong> <span>Master</span></li>
-                  <li><i class="bi bi-chevron-right"></i> <strong>Email:</strong> <span>email@example.com</span></li>
-                  <li><i class="bi bi-chevron-right"></i> <strong>Freelance:</strong> <span>Available</span></li>
-                </ul>
-              </div>
+          <div class="col-lg-9 content">
+            <h4>{{ $about->objective_title ?? 'Career Summary' }}</h4>
+            <div class="py-3" style="text-align: justify;">
+              {!! nl2br(e($about->career_objective ?? '')) !!}
             </div>
-            <p class="py-3">
-              Officiis eligendi itaque labore et dolorum mollitia officiis optio vero. Quisquam sunt adipisci omnis et
-              ut. Nulla accusantium dolor incidunt officia tempore. Et eius omnis.
-              Cupiditate ut dicta maxime officiis quidem quia. Sed et consectetur qui quia repellendus itaque neque.
-            </p>
+            <div class="row mt-4">
+              @if($about && $about->details)
+                @foreach($about->details as $item)
+                  <div class="col-lg-6">
+                    <ul class="ps-0">
+                      <li class="list-unstyled d-flex align-items-center mb-3">
+                        <i class="bi bi-chevron-right me-2" style="color: var(--accent-color);"></i>
+                        <strong class="me-1">{{ $item['label'] }}:</strong>
+                        <span>
+                          @if($item['type'] == 'link')
+                            <a href="{{ $item['value'] }}" target="_blank">{{ $item['value'] }}</a>
+                          @else
+                            {{ $item['value'] }}
+                          @endif
+                        </span>
+                      </li>
+                    </ul>
+                  </div>
+                @endforeach
+              @endif
+            </div>
           </div>
         </div>
 
@@ -110,120 +76,197 @@
 
       <!-- Section Title -->
       <div class="container section-title" data-aos="fade-up">
-        <h2>Skills</h2>
-        <p>Necessitatibus eius consequatur ex aliquid fuga eum quidem sint consectetur velit</p>
+        <h2>{{ $skillSettings->title ?? 'Skills' }}</h2>
+        @if($skillSettings->subtitle)
+          <p>{{ $skillSettings->subtitle }}</p>
+        @endif
       </div><!-- End Section Title -->
 
       <div class="container" data-aos="fade-up" data-aos-delay="100">
 
         <div class="row skills-content skills-animation">
-
-          <div class="col-lg-6">
-
-            <div class="progress">
-              <span class="skill"><span>HTML</span> <i class="val">100%</i></span>
-              <div class="progress-bar-wrap">
-                <div class="progress-bar" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
-                </div>
+          @if($skills && count($skills) > 0)
+            @php
+              $skillChunks = array_chunk($skills->toArray(), ceil(count($skills) / 2));
+            @endphp
+            @foreach($skillChunks as $chunk)
+              <div class="col-lg-6">
+                @foreach($chunk as $skill)
+                  <div class="progress">
+                    <span class="skill"><span>{{ $skill['name'] }}</span> <i class="val">{{ $skill['percent'] }}%</i></span>
+                    <div class="progress-bar-wrap">
+                      <div class="progress-bar" role="progressbar" aria-valuenow="{{ $skill['percent'] }}" aria-valuemin="0"
+                        aria-valuemax="100">
+                      </div>
+                    </div>
+                  </div><!-- End Skills Item -->
+                @endforeach
               </div>
-            </div><!-- End Skills Item -->
-
-            <div class="progress">
-              <span class="skill"><span>CSS</span> <i class="val">90%</i></span>
-              <div class="progress-bar-wrap">
-                <div class="progress-bar" role="progressbar" aria-valuenow="90" aria-valuemin="0" aria-valuemax="100">
-                </div>
-              </div>
-            </div><!-- End Skills Item -->
-
-            <div class="progress">
-              <span class="skill"><span>JavaScript</span> <i class="val">75%</i></span>
-              <div class="progress-bar-wrap">
-                <div class="progress-bar" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">
-                </div>
-              </div>
-            </div><!-- End Skills Item -->
-
-          </div>
-
-          <div class="col-lg-6">
-
-            <div class="progress">
-              <span class="skill"><span>PHP</span> <i class="val">80%</i></span>
-              <div class="progress-bar-wrap">
-                <div class="progress-bar" role="progressbar" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100">
-                </div>
-              </div>
-            </div><!-- End Skills Item -->
-
-            <div class="progress">
-              <span class="skill"><span>WordPress/CMS</span> <i class="val">90%</i></span>
-              <div class="progress-bar-wrap">
-                <div class="progress-bar" role="progressbar" aria-valuenow="90" aria-valuemin="0" aria-valuemax="100">
-                </div>
-              </div>
-            </div><!-- End Skills Item -->
-
-            <div class="progress">
-              <span class="skill"><span>Photoshop</span> <i class="val">55%</i></span>
-              <div class="progress-bar-wrap">
-                <div class="progress-bar" role="progressbar" aria-valuenow="55" aria-valuemin="0" aria-valuemax="100">
-                </div>
-              </div>
-            </div><!-- End Skills Item -->
-
-          </div>
-
+            @endforeach
+          @endif
         </div>
 
       </div>
 
     </section><!-- /Skills Section -->
 
+    <!-- Awards & Certifications Section -->
+    <section id="awards" class="awards section bg-light py-5">
+      <!-- Section Title -->
+      <div class="container section-title" data-aos="fade-up">
+        <h2>{{ $awardSettings->title ?? 'Awards & Certifications' }}</h2>
+        @if($awardSettings->subtitle)
+          <p>{{ $awardSettings->subtitle }}</p>
+        @endif
+      </div><!-- End Section Title -->
+
+      <div class="container" data-aos="fade-up" data-aos-delay="100">
+        <div class="row gy-4">
+          @if($awards && count($awards) > 0)
+            @foreach($awards as $award)
+              <div class="col-lg-4 col-md-6">
+                <div class="award-card p-4 h-100 bg-white rounded shadow-sm border-0 position-relative"
+                  style="transition: all 0.3s ease;">
+                  <div class="d-flex justify-content-between align-items-start mb-3">
+                    <span class="badge py-2 px-3 rounded-pill small fw-bold theme-accent-bg-light theme-accent-color">
+                      {{ $award->year }}
+                    </span>
+                    <i class="bi bi-patch-check-fill fs-4 theme-accent-color"></i>
+                  </div>
+                  <h5 class="fw-bold mb-1">{{ $award->title }}</h5>
+                  <p class="text-muted small mb-3"><i class="bi bi-building me-1"></i> {{ $award->organization }}</p>
+                  @if($award->description)
+                    <p class="small text-secondary mb-3">{{ $award->description }}</p>
+                  @endif
+
+                  {{-- Multiple Proofs --}}
+                  <div class="award-proofs mt-auto">
+                    @if($award->proofs && count($award->proofs) > 0)
+                      <div class="d-flex flex-wrap gap-2">
+                        @foreach($award->proofs as $proof)
+                          @php
+                            $isProtected = isset($proof['is_protected']) && $proof['is_protected'];
+                          @endphp
+                          <a href="{{ $isProtected ? 'javascript:void(0)' : $proof['value'] }}"
+                            target="{{ $isProtected ? '' : '_blank' }}"
+                            class="btn btn-xs btn-outline-theme rounded-pill px-3 py-1 proof-link" @if($isProtected)
+                            onclick="verifyAwardPassword('{{ $proof['value'] }}', '{{ $proof['password'] }}')" @endif>
+                            @if($isProtected)
+                              <i class="bi bi-lock-fill me-1 text-danger"></i>
+                            @else
+                              <i class="bi bi-link-45deg me-1"></i>
+                            @endif
+                            {{ $proof['label'] ?? 'Certificate' }}
+                          </a>
+                        @endforeach
+                      </div>
+                    @elseif($award->proof_url)
+                      {{-- Fallback for old single link --}}
+                      <a href="{{ $award->proof_url }}" target="_blank"
+                        class="btn btn-sm btn-outline-theme w-100 rounded-pill py-2">
+                        <i class="bi bi-link-45deg me-1"></i> View Certificate
+                      </a>
+                    @endif
+                  </div>
+                </div>
+              </div>
+            @endforeach
+          @endif
+        </div>
+      </div>
+
+      <script>
+        function verifyAwardPassword(url, password) {
+          Swal.fire({
+            title: 'Password Protected',
+            text: 'Please enter the password to view this certificate',
+            input: 'password',
+            confirmButtonColor: 'var(--accent-color)',
+            showCancelButton: true,
+            confirmButtonText: 'Access',
+            showLoaderOnConfirm: true,
+            preConfirm: (inputPassword) => {
+              if (inputPassword === password) {
+                return true;
+              } else {
+                Swal.showValidationMessage('Incorrect password');
+                return false;
+              }
+            },
+            allowOutsideClick: () => !Swal.isLoading()
+          }).then((result) => {
+            if (result.isConfirmed) {
+              window.open(url, '_blank');
+            }
+          });
+        }
+      </script>
+
+      <style>
+        .award-card {
+          border: 1px solid rgba(0, 0, 0, 0.05) !important;
+        }
+
+        .award-card:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08) !important;
+          border-color: var(--accent-color) !important;
+        }
+
+        .theme-accent-color {
+          color: var(--accent-color) !important;
+        }
+
+        .theme-accent-bg-light {
+          background-color: color-mix(in srgb, var(--accent-color), transparent 90%) !important;
+        }
+
+        .btn-outline-theme {
+          color: var(--accent-color);
+          border: 1px solid var(--accent-color);
+          font-size: 11px;
+          transition: all 0.3s;
+        }
+
+        .btn-outline-theme:hover {
+          background-color: var(--accent-color);
+          color: #fff;
+        }
+
+        .btn-xs {
+          padding: 2px 8px;
+          font-size: 0.75rem;
+        }
+      </style>
+    </section><!-- /Awards & Certifications Section -->
+
     <!-- Stats Section -->
     <section id="stats" class="stats section">
 
       <!-- Section Title -->
       <div class="container section-title" data-aos="fade-up">
-        <h2>Facts</h2>
-        <p>Necessitatibus eius consequatur ex aliquid fuga eum quidem sint consectetur velit</p>
+        <h2>{{ $counterSettings->title ?? 'Facts' }}</h2>
+        @if($counterSettings->subtitle)
+          <p>{{ $counterSettings->subtitle }}</p>
+        @endif
       </div><!-- End Section Title -->
 
       <div class="container" data-aos="fade-up" data-aos-delay="100">
 
         <div class="row gy-4">
 
-          <div class="col-lg-3 col-md-6">
-            <div class="stats-item text-center w-100 h-100">
-              <span data-purecounter-start="0" data-purecounter-end="232" data-purecounter-duration="1"
-                class="purecounter"></span>
-              <p>Clients</p>
-            </div>
-          </div><!-- End Stats Item -->
-
-          <div class="col-lg-3 col-md-6">
-            <div class="stats-item text-center w-100 h-100">
-              <span data-purecounter-start="0" data-purecounter-end="521" data-purecounter-duration="1"
-                class="purecounter"></span>
-              <p>Projects</p>
-            </div>
-          </div><!-- End Stats Item -->
-
-          <div class="col-lg-3 col-md-6">
-            <div class="stats-item text-center w-100 h-100">
-              <span data-purecounter-start="0" data-purecounter-end="1453" data-purecounter-duration="1"
-                class="purecounter"></span>
-              <p>Hours Of Support</p>
-            </div>
-          </div><!-- End Stats Item -->
-
-          <div class="col-lg-3 col-md-6">
-            <div class="stats-item text-center w-100 h-100">
-              <span data-purecounter-start="0" data-purecounter-end="32" data-purecounter-duration="1"
-                class="purecounter"></span>
-              <p>Workers</p>
-            </div>
-          </div><!-- End Stats Item -->
+          @if($counters && count($counters) > 0)
+            @foreach($counters as $counter)
+              <div class="col-lg-3 col-md-6">
+                <div class="stats-item text-center w-100 h-100">
+                  <span data-purecounter-start="0"
+                    data-purecounter-end="{{ preg_replace('/[^0-9]/', '', $counter->value) }}" data-purecounter-duration="1"
+                    class="purecounter"></span>
+                  <p>{{ $counter->name }}</p>
+                </div>
+              </div><!-- End Stats Item -->
+            @endforeach
+          @endif
 
         </div>
 
@@ -362,51 +405,7 @@
 
   </main>
 
-  <footer id="footer" class="footer light-background">
-
-    <div class="container">
-      <div class="copyright text-center ">
-        <p>© <span>Copyright</span> <strong class="px-1 sitename">Kelly</strong> <span>All Rights Reserved<br></span>
-        </p>
-      </div>
-      <div class="social-links d-flex justify-content-center">
-        <a href=""><i class="bi bi-twitter-x"></i></a>
-        <a href=""><i class="bi bi-facebook"></i></a>
-        <a href=""><i class="bi bi-instagram"></i></a>
-        <a href=""><i class="bi bi-linkedin"></i></a>
-      </div>
-      <div class="credits">
-        <!-- All the links in the footer should remain intact. -->
-        <!-- You can delete the links only if you've purchased the pro version. -->
-        <!-- Licensing information: https://bootstrapmade.com/license/ -->
-        <!-- Purchase the pro version with working PHP/AJAX contact form: [buy-url] -->
-        Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a> Distributed by <a
-          href=“https://themewagon.com>ThemeWagon
-      </div>
-    </div>
-
-  </footer>
-
-  <!-- Scroll Top -->
-  <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i
-      class="bi bi-arrow-up-short"></i></a>
-
-  <!-- Preloader -->
-  <div id="preloader"></div>
-
-  <!-- Vendor JS Files -->
-  <script src="{{ asset('UI/assets/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-  <script src="{{ asset('UI/assets/vendor/php-email-form/validate.js') }}"></script>
-  <script src="{{ asset('UI/assets/vendor/aos/aos.js') }}"></script>
-  <script src="{{ asset('UI/assets/vendor/waypoints/noframework.waypoints.js') }}"></script>
-  <script src="{{ asset('UI/assets/vendor/purecounter/purecounter_vanilla.js') }}"></script>
-  <script src="{{ asset('UI/assets/vendor/swiper/swiper-bundle.min.js') }}"></script>
-  <script src="{{ asset('UI/assets/vendor/glightbox/js/glightbox.min.js') }}"></script>
-  <script src="{{ asset('UI/assets/vendor/imagesloaded/imagesloaded.pkgd.min.js') }}"></script>
-  <script src="{{ asset('UI/assets/vendor/isotope-layout/isotope.pkgd.min.js') }}"></script>
-
-  <!-- Main JS File -->
-  <script src="{{ asset('UI/assets/js/main.js') }}"></script>
+  @include('frontend.include.footer')
 
 </body>
 

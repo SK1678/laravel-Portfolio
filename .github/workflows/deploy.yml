@@ -1,9 +1,8 @@
-name: 🚀 Deploy to Production
-
+name: 🚀 Deploy to Production (Manual)
+# NOTE: StackCP handles auto-deployment via its built-in Git integration.
+# This workflow is kept as a manual backup only.
 on:
-  push:
-    branches:
-      - main   # Auto-deploy when you push to main branch
+  workflow_dispatch:  # Only runs when manually triggered from GitHub Actions UI
 
 jobs:
   deploy:

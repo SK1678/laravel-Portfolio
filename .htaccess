@@ -1,10 +1,9 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
-    # Redirect to HTTPS (Optional but recommended for production)
-    # RewriteCond %{HTTPS} off
-    # RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+    # Stop rewriting if already pointing to public/ (prevents infinite loop)
+    RewriteRule ^public/ - [L]
 
-    # Handle the request by redirecting to the public directory
+    # Route everything else into the public directory
     RewriteRule ^(.*)$ public/$1 [L]
 </IfModule>

@@ -48,7 +48,7 @@ class GoogleController extends Controller
 
             $loggedInUser = Auth::user();
 
-            if ($loggedInUser->isAdmin()) {
+            if ($loggedInUser && $loggedInUser->isAdmin()) {
                 return redirect()->route('dashboard');
             }
 

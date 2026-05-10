@@ -28,6 +28,8 @@ class User extends Authenticatable
         'user_type',
         'is_site_owner',
         'additional_info',
+        'google_id',
+        'avatar',
     ];
 
     /**
@@ -69,5 +71,15 @@ class User extends Authenticatable
     public function isUser(): bool
     {
         return $this->user_type === 'user';
+    }
+
+    public function sentMessages()
+    {
+        return $this->hasMany(ChatMessage::class, 'sender_id');
+    }
+
+    public function receivedMessages()
+    {
+        return $this->hasMany(ChatMessage::class, 'receiver_id');
     }
 }

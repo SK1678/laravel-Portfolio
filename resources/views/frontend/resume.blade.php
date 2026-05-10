@@ -25,19 +25,29 @@
             @if(count($education) > 0)
               @foreach($education as $item)
                 <div class="resume-item">
-                  <h4>{{ $item['degree'] ?? '' }} in {{ $item['major'] ?? '' }}</h4>
-                  <h5>{{ $item['year'] ?? '' }} ({{ $item['duration'] ?? '' }})</h5>
-                  <p><em>{{ $item['institution'] ?? '' }}</em></p>
-                  <p>Result: {{ $item['result'] ?? '' }}</p>
+                  <h4>{{ ucfirst(strtolower(($item['degree'] ?? '') . ' in ' . ($item['major'] ?? ''))) }}</h4>
+                  <h5>
+                    {{ $item['year'] ?? '' }} ({{ $item['duration'] ?? '' }}) 
+                    @if(isset($item['result']) && $item['result'])
+                      | Result: {{ $item['result'] }}
+                    @endif
+                  </h5>
+                  <p><span class="resume-org fw-bold text-primary">{{ $item['institution'] ?? '' }}</span></p>
                   @if(isset($item['description']) && $item['description'])
-                    <p>{{ $item['description'] }}</p>
+                    <p class="description">{{ $item['description'] }}</p>
                   @endif
                   @if(isset($item['documents']) && count($item['documents']) > 0)
-                    <div class="mt-2">
+                    <div class="mt-3">
                       @foreach($item['documents'] as $doc)
-                        <a href="{{ asset('storage/' . $doc['path']) }}" target="_blank" class="btn btn-sm btn-outline-primary py-0 px-2 me-1 mb-1" style="font-size: 0.7rem;">
-                          <i class="bi bi-file-earmark-pdf"></i> {{ $doc['name'] }}
-                        </a>
+                        @php 
+                            $isProtected = !empty($doc['password']);
+                            $fileUrl = asset('storage/' . $doc['path']);
+                        @endphp
+                        <button type="button" 
+                           onclick="handleFileAccess('{{ $fileUrl }}', '{{ $doc['password'] ?? '' }}')"
+                           class="btn-resume me-1 mb-2">
+                           <i class="bi bi-file-earmark-{{ $isProtected ? 'lock' : 'pdf' }}"></i> {{ $doc['name'] }}
+                        </button>
                       @endforeach
                     </div>
                   @endif
@@ -54,13 +64,29 @@
             @if(count($professional) > 0)
               @foreach($professional as $item)
                 <div class="resume-item">
-                  <h4>{{ $item['role'] ?? '' }}</h4>
+                  <h4>{{ ucfirst(strtolower($item['role'] ?? '')) }}</h4>
                   <h5>
                     {{ \Carbon\Carbon::parse($item['start_date'])->format('M Y') }} - 
                     {{ $item['end_date'] ? \Carbon\Carbon::parse($item['end_date'])->format('M Y') : 'Present' }}
                   </h5>
-                  <p><em>{{ $item['company'] ?? '' }}</em></p>
-                  <p>{{ $item['description'] ?? '' }}</p>
+                  <p><span class="resume-org fw-bold text-primary">{{ $item['company'] ?? '' }}</span></p>
+                  <p class="description">{{ $item['description'] ?? '' }}</p>
+                  
+                  @if(isset($item['documents']) && count($item['documents']) > 0)
+                    <div class="mt-2">
+                      @foreach($item['documents'] as $doc)
+                        @php 
+                            $isProtected = !empty($doc['password']);
+                            $fileUrl = asset('storage/' . $doc['path']);
+                        @endphp
+                        <button type="button" 
+                           onclick="handleFileAccess('{{ $fileUrl }}', '{{ $doc['password'] ?? '' }}')"
+                           class="btn-resume me-1 mb-1">
+                           <i class="bi bi-file-earmark-{{ $isProtected ? 'lock' : 'pdf' }}"></i> {{ $doc['name'] }}
+                        </button>
+                      @endforeach
+                    </div>
+                  @endif
                 </div><!-- Edn Resume Item -->
               @endforeach
             @else
@@ -75,6 +101,80 @@
     </section><!-- /Resume Section -->
 
   </main>
+  
+  <style>
+    .resume-item h4 {
+        text-transform: none !important;
+        font-weight: 700;
+        margin-bottom: 5px;
+    }
+    .resume-org {
+        color: var(--accent-color) !important;
+        font-size: 0.95rem;
+    }
+    .resume-item .description {
+        text-align: justify;
+    }
+    .btn-resume {
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 12px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        color: var(--accent-color);
+        background-color: transparent;
+        border: 1px solid var(--accent-color);
+        border-radius: 50px;
+        transition: all 0.3s ease;
+        text-decoration: none;
+    }
+    .btn-resume i {
+        margin-right: 5px;
+    }
+    .btn-resume:hover {
+        background-color: var(--accent-color);
+        color: var(--contrast-color);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+  </style>
+
+  <script>
+    function handleFileAccess(url, password) {
+        if (!password) {
+            window.open(url, '_blank');
+            return;
+        }
+
+        Swal.fire({
+            title: 'Password Protected',
+            text: 'Please enter the password to view this document:',
+            input: 'password',
+            inputAttributes: {
+                autocapitalize: 'off',
+                autocorrect: 'off'
+            },
+            showCancelButton: true,
+            confirmButtonText: 'Open File',
+            confirmButtonColor: 'var(--accent-color)',
+            showLoaderOnConfirm: true,
+            preConfirm: (inputPassword) => {
+                if (inputPassword === password) {
+                    return true;
+                } else {
+                    Swal.showValidationMessage('Incorrect password!');
+                    return false;
+                }
+            },
+            allowOutsideClick: () => !Swal.isLoading()
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.open(url, '_blank');
+            }
+        });
+    }
+  </script>
+
   @include('frontend.include.footer')
 </body>
 

@@ -16,4 +16,16 @@ class HomeController extends Controller
         
         return view('frontend.home', compact('homeSettings', 'siteOwner'));
     }
+
+    public function trackClick(Request $request)
+    {
+        \App\Models\SiteSetting::query()->increment('total_clicks');
+
+        // Log to site_analytics for time-series charts
+        \DB::table('site_analytics')->insert([
+            'type' => 'click',
+            'created_at' => now(),
+        ]);
+        return response()->json(['status' => 'success']);
+    }
 }

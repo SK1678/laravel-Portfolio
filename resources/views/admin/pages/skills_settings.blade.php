@@ -11,6 +11,11 @@
                     <p class="mb-3">Configure your professional skills and proficiency levels</p>
                 </div>
             </div>
+            <div class="col-sm-6 p-md-0 justify-content-sm-end mt-2 mt-sm-0 d-flex align-items-center">
+                <a href="{{ route('page') }}" class="btn btn-light btn-sm px-3 border shadow-sm">
+                    <i class="ti ti-arrow-left me-1"></i> Back
+                </a>
+            </div>
         </div>
 
         <form id="skillsSettingsForm">
@@ -21,11 +26,13 @@
                 <div class="row">
                     <div class="col-md-12 mb-3">
                         <label class="form-label small fw-bold">Section Title</label>
-                        <input type="text" name="title" class="form-control" value="{{ $settings->title }}" placeholder="e.g. Skills">
+                        <input type="text" name="title" class="form-control" value="{{ $settings->title }}"
+                            placeholder="e.g. Skills">
                     </div>
                     <div class="col-md-12">
                         <label class="form-label small fw-bold">Section Sub Title</label>
-                        <textarea name="subtitle" class="form-control" rows="3" placeholder="Enter section description...">{{ $settings->subtitle }}</textarea>
+                        <textarea name="subtitle" class="form-control" rows="3"
+                            placeholder="Enter section description...">{{ $settings->subtitle }}</textarea>
                     </div>
                 </div>
             </div>
@@ -43,20 +50,22 @@
                     @foreach($skills as $skill)
                         <div class="col-md-6 skill-item mb-4">
                             <div class="card border shadow-sm position-relative">
-                                <button type="button" class="btn btn-danger btn-sm position-absolute" 
-                                        style="top: -10px; right: -10px; border-radius: 50%; width: 25px; height: 25px; padding: 0; line-height: 25px; z-index: 5;"
-                                        onclick="this.closest('.skill-item').remove()">
+                                <button type="button" class="btn btn-danger btn-sm position-absolute"
+                                    style="top: -10px; right: -10px; border-radius: 50%; width: 25px; height: 25px; padding: 0; line-height: 25px; z-index: 5;"
+                                    onclick="this.closest('.skill-item').remove()">
                                     <i class="ti ti-x"></i>
                                 </button>
                                 <div class="card-body p-3">
                                     <div class="row">
                                         <div class="col-md-8">
                                             <label class="form-label small fw-bold">Skill Name</label>
-                                            <input type="text" name="names[]" class="form-control" value="{{ $skill->name }}" placeholder="e.g. Laravel">
+                                            <input type="text" name="names[]" class="form-control" value="{{ $skill->name }}"
+                                                placeholder="e.g. Laravel">
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label small fw-bold">Percent (%)</label>
-                                            <input type="number" name="percents[]" class="form-control" value="{{ $skill->percent }}" min="0" max="100">
+                                            <input type="number" name="percents[]" class="form-control"
+                                                value="{{ $skill->percent }}" min="0" max="100">
                                         </div>
                                     </div>
                                 </div>
@@ -79,26 +88,31 @@
             border-radius: 12px;
             padding: 24px;
             border: 1px solid #eee;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
         }
+
         .hs-section-label {
             font-size: 1rem;
             font-weight: 700;
             color: #333;
             margin-bottom: 20px;
         }
+
         .btn-primary {
             background: #E66239;
             border-color: #E66239;
         }
+
         .btn-primary:hover {
             background: #d45630;
             border-color: #d45630;
         }
+
         .btn-outline-primary {
             color: #E66239;
             border-color: #E66239;
         }
+
         .btn-outline-primary:hover {
             background: #E66239;
             color: #fff;
@@ -111,30 +125,30 @@
             const div = document.createElement('div');
             div.className = 'col-md-6 skill-item mb-4';
             div.innerHTML = `
-                <div class="card border shadow-sm position-relative">
-                    <button type="button" class="btn btn-danger btn-sm position-absolute" 
-                            style="top: -10px; right: -10px; border-radius: 50%; width: 25px; height: 25px; padding: 0; line-height: 25px; z-index: 5;"
-                            onclick="this.closest('.skill-item').remove()">
-                        <i class="ti ti-x"></i>
-                    </button>
-                    <div class="card-body p-3">
-                        <div class="row">
-                            <div class="col-md-8">
-                                <label class="form-label small fw-bold">Skill Name</label>
-                                <input type="text" name="names[]" class="form-control" value="${name}" placeholder="e.g. Laravel">
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label small fw-bold">Percent (%)</label>
-                                <input type="number" name="percents[]" class="form-control" value="${percent}" min="0" max="100">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
+                                <div class="card border shadow-sm position-relative">
+                                    <button type="button" class="btn btn-danger btn-sm position-absolute" 
+                                            style="top: -10px; right: -10px; border-radius: 50%; width: 25px; height: 25px; padding: 0; line-height: 25px; z-index: 5;"
+                                            onclick="this.closest('.skill-item').remove()">
+                                        <i class="ti ti-x"></i>
+                                    </button>
+                                    <div class="card-body p-3">
+                                        <div class="row">
+                                            <div class="col-md-8">
+                                                <label class="form-label small fw-bold">Skill Name</label>
+                                                <input type="text" name="names[]" class="form-control" value="${name}" placeholder="e.g. Laravel">
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label small fw-bold">Percent (%)</label>
+                                                <input type="number" name="percents[]" class="form-control" value="${percent}" min="0" max="100">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
             container.appendChild(div);
         }
 
-        document.getElementById('skillsSettingsForm').addEventListener('submit', function(e) {
+        document.getElementById('skillsSettingsForm').addEventListener('submit', function (e) {
             e.preventDefault();
             const formData = new FormData(this);
             const btn = this.querySelector('.hs-save-btn');

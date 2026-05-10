@@ -182,12 +182,24 @@
                                 
                                 <!-- Attachments -->
                                 @if(!empty($item['documents']))
-                                    <div class="mt-2 d-flex flex-wrap gap-2">
+                                    <div class="mt-3 d-flex flex-wrap gap-2">
                                         @foreach($item['documents'] as $doc)
+                                            @php
+                                                $ext = pathinfo($doc['path'], PATHINFO_EXTENSION);
+                                                $icon = match(strtolower($ext)) {
+                                                    'pdf' => 'file-type-pdf',
+                                                    'doc', 'docx' => 'file-text',
+                                                    'xls', 'xlsx' => 'file-spreadsheet',
+                                                    'png', 'jpg', 'jpeg' => 'photo',
+                                                    'zip', 'rar' => 'zip',
+                                                    default => 'paperclip',
+                                                };
+                                                if (isset($doc['password']) && $doc['password']) $icon = 'lock-square';
+                                            @endphp
                                             <a href="{{ asset('storage/' . $doc['path']) }}" target="_blank" 
-                                               class="btn btn-extra-sm btn-light border text-primary rounded-pill px-3 py-1 fw-medium shadow-sm"
+                                               class="btn btn-extra-sm btn-light border d-inline-flex align-items-center gap-1 rounded-pill px-3 py-1 fw-semibold text-primary transition-all hover-shadow"
                                                title="{{ isset($doc['password']) && $doc['password'] ? 'Password Protected' : 'Open Document' }}">
-                                                <i class="ti ti-{{ isset($doc['password']) && $doc['password'] ? 'lock' : 'file-download' }} me-1"></i>
+                                                <i class="ti ti-{{ $icon }} fs-6"></i>
                                                 {{ $doc['name'] }}
                                             </a>
                                         @endforeach
@@ -231,12 +243,24 @@
 
                                     <!-- Experience Attachments -->
                                     @if(!empty($item['documents']))
-                                        <div class="d-flex flex-wrap gap-2">
+                                        <div class="mt-3 d-flex flex-wrap gap-2">
                                             @foreach($item['documents'] as $doc)
+                                                @php
+                                                    $ext = pathinfo($doc['path'], PATHINFO_EXTENSION);
+                                                    $icon = match(strtolower($ext)) {
+                                                        'pdf' => 'file-type-pdf',
+                                                        'doc', 'docx' => 'file-text',
+                                                        'xls', 'xlsx' => 'file-spreadsheet',
+                                                        'png', 'jpg', 'jpeg' => 'photo',
+                                                        'zip', 'rar' => 'zip',
+                                                        default => 'paperclip',
+                                                    };
+                                                    if (isset($doc['password']) && $doc['password']) $icon = 'lock-square';
+                                                @endphp
                                                 <a href="{{ asset('storage/' . $doc['path']) }}" target="_blank" 
-                                                   class="btn btn-extra-sm btn-light border text-success rounded-pill px-3 py-1 fw-medium shadow-sm"
+                                                   class="btn btn-extra-sm btn-light border d-inline-flex align-items-center gap-1 rounded-pill px-3 py-1 fw-semibold text-success transition-all hover-shadow"
                                                    title="{{ isset($doc['password']) && $doc['password'] ? 'Password Protected' : 'Open Document' }}">
-                                                    <i class="ti ti-{{ isset($doc['password']) && $doc['password'] ? 'lock' : 'file-download' }} me-1"></i>
+                                                    <i class="ti ti-{{ $icon }} fs-6"></i>
                                                     {{ $doc['name'] }}
                                                 </a>
                                             @endforeach
@@ -275,7 +299,18 @@
 
         .btn-extra-sm {
             padding: 0.15rem 0.6rem;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
+            letter-spacing: 0.3px;
+        }
+
+        .hover-shadow:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.08) !important;
+            transform: translateY(-1px);
+            background-color: #fdfdfd !important;
+        }
+
+        .transition-all {
+            transition: all 0.2s ease-in-out;
         }
 
         .last-child-no-border:last-child {

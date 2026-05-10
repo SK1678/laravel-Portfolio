@@ -1,41 +1,159 @@
 @extends('admin.layouts.admin')
 
-@section('title', 'Messages')
+@section('title', 'Inquiries & Messages')
 
 @section('content')
-<div class="container-fluid">
-    <div class="row page-titles mx-0">
-        <div class="col-sm-6 p-md-0">
-            <div class="welcome-text">
-                <h4>Messages</h4>
-                <p class="mb-0">Manage your inquiries</p>
-            </div>
-        </div>
-        <div class="col-sm-6 p-md-0 justify-content-sm-end mt-2 mt-sm-0 d-flex">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-                <li class="breadcrumb-item active"><a href="javascript:void(0)">Page Configurations</a></li>
-            </ol>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold">Messages</h2>
+    <div class="d-flex align-items-center">
+        <a href="{{ route('page') }}" class="btn btn-light btn-sm px-3 border shadow-sm">
+            <i class="ti ti-arrow-left me-1"></i> Back
+        </a>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm rounded-4">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="ps-4 py-3">Sender</th>
+                        <th class="py-3">Subject</th>
+                        <th class="py-3">Message Preview</th>
+                        <th class="py-3 text-center">Status</th>
+                        <th class="py-3 text-center">Date</th>
+                        <th class="pe-4 py-3 text-end">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="messages-table-body">
+                    @include('admin.pages.messages_list')
+                </tbody>
+            </table>
         </div>
     </div>
+    <div id="pagination-container">
+        @if($messages->hasPages())
+        <div class="card-footer bg-white border-0 py-3">
+            {{ $messages->links() }}
+        </div>
+        @endif
+    </div>
+</div>
 
-    <div class="row">
-        <div class="col-xl-12">
-            <div class="card shadow-sm border-0">
-                <div class="card-body text-center py-5">
-                    <div class="mb-4">
-                        <i class="ti ti-layout-dashboard fs-1 text-primary opacity-50" style="font-size: 5rem;"></i>
-                    </div>
-                    <h2 class="fw-bold">Module Under Construction</h2>
-                    <p class="text-muted mx-auto" style="max-width: 500px;">
-                        We are currently building a powerful landing page builder that will allow you to drag-and-drop sections, customize layouts, and manage your site's content effortlessly.
-                    </p>
-                    <div class="mt-4">
-                        <a href="{{ route('dashboard') }}" class="btn btn-primary px-4">Back to Dashboard</a>
-                    </div>
+<!-- View Message Modal -->
+<div class="modal fade" id="messageModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow rounded-4">
+            <div class="modal-header border-0 bg-danger text-white rounded-top-4">
+                <h5 class="modal-title fw-bold" id="modalSubject">Message Subject</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="mb-3">
+                    <label class="text-muted small text-uppercase fw-bold">From</label>
+                    <div id="modalSender" class="fw-bold text-dark"></div>
+                    <div id="modalEmail" class="text-danger small"></div>
                 </div>
+                <hr class="opacity-10">
+                <div class="mb-0">
+                    <label class="text-muted small text-uppercase fw-bold">Message</label>
+                    <p id="modalBody" class="text-dark mt-2" style="white-space: pre-wrap; line-height: 1.6;"></p>
+                </div>
+            </div>
+            <div class="modal-footer border-0 p-3">
+                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Close</button>
+                <a href="" id="replyBtn" class="btn btn-danger rounded-pill px-4">Reply via Email</a>
             </div>
         </div>
     </div>
 </div>
+
+@push('scripts')
+<script>
+$(document).ready(function() {
+    // Polling for new messages
+    function fetchMessages() {
+        // Only fetch if not currently viewing a modal or typing (optional)
+        if ($('#messageModal').is(':visible')) return;
+
+        $.ajax({
+            url: window.location.href,
+            type: 'GET',
+            success: function(data) {
+                // We only want to update the table body to avoid jumping
+                // However, the pagination might also need updating.
+                // A better way is to compare content or count.
+                const currentHtml = $('#messages-table-body').html();
+                // Extract only the tbody content from the response
+                const $response = $(data);
+                // Wait, I returned the partial directly if AJAX!
+                const newHtml = data; 
+                
+                if (currentHtml.trim() !== newHtml.trim()) {
+                    $('#messages-table-body').html(newHtml);
+                }
+            }
+        });
+    }
+
+    // Poll every 10 seconds
+    setInterval(fetchMessages, 10000);
+
+    // View Message
+    $(document).on('click', '.view-message', function() {
+        const id = $(this).data('id');
+        const name = $(this).data('name');
+        const email = $(this).data('email');
+        const subject = $(this).data('subject');
+        const body = $(this).data('body');
+        
+        $('#modalSubject').text(subject);
+        $('#modalSender').text(name);
+        $('#modalEmail').text(email);
+        $('#modalBody').text(body);
+        $('#replyBtn').attr('href', 'mailto:' + email + '?subject=Re: ' + subject);
+        
+        const myModal = new bootstrap.Modal(document.getElementById('messageModal'));
+        myModal.show();
+
+        // Mark as read via AJAX
+        $.ajax({
+            url: `{{ url('/dashboard/messages') }}/${id}/mark-as-read`,
+            type: 'POST',
+            data: { _token: '{{ csrf_token() }}' },
+            success: function() {
+                $(`#message-row-${id}`).css('background-color', 'transparent');
+                $(`#message-row-${id} .badge`).removeClass('bg-danger-subtle text-danger').addClass('bg-success-subtle text-success').text('Read');
+            }
+        });
+    });
+
+    // Delete Message
+    $(document).on('click', '.delete-message', function() {
+        const id = $(this).data('id');
+        Swal.fire({
+            title: 'Delete Message?',
+            text: "This action cannot be undone!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: `{{ url('/dashboard/messages') }}/${id}`,
+                    type: 'DELETE',
+                    data: { _token: '{{ csrf_token() }}' },
+                    success: function() {
+                        $(`#message-row-${id}`).fadeOut();
+                        Swal.fire('Deleted!', 'Message removed.', 'success');
+                    }
+                });
+            }
+        });
+    });
+});
+</script>
+@endpush
 @endsection

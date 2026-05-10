@@ -24,23 +24,31 @@
                     <div class="col-md-4">
                         <div class="card border-0 shadow-sm rounded-3 mb-4">
                             <div class="card-body text-center p-4">
-                                <div class="profile-upload-container mb-3">
-                                    <input type="file" name="profile_image" id="profile_image" class="d-none"
-                                        accept="image/*" onchange="previewImage(this)">
-                                    <label for="profile_image"
-                                        class="profile-preview-wrapper shadow-sm border d-flex align-items-center justify-content-center overflow-hidden rounded-circle bg-white mx-auto"
-                                        style="width: 130px; height: 130px; cursor: pointer;">
-                                        @if($user->profile_image)
-                                            <img id="image_preview" src="{{ asset('storage/' . $user->profile_image) }}"
-                                                class="w-100 h-100 object-fit-cover" alt="Preview">
-                                        @else
-                                            <img id="image_preview" src="" class="w-100 h-100 object-fit-cover d-none"
-                                                alt="Preview">
-                                            <div id="upload_placeholder" class="text-center text-muted">
-                                                <i class="ti ti-camera fs-2"></i>
-                                            </div>
-                                        @endif
-                                    </label>
+                                <div class="profile-upload-container mb-3 mx-auto" style="width: 130px; height: 130px;">
+                                    <div class="logo-upload-box shadow-sm rounded-circle border overflow-hidden position-relative w-100 h-100">
+                                        <div class="preview-area" id="profilePreview">
+                                            @if($user->profile_image)
+                                                <img id="image_preview" src="{{ asset('storage/' . $user->profile_image) }}"
+                                                    class="w-100 h-100 object-fit-cover" alt="Preview">
+                                            @else
+                                                <div class="text-center text-muted">
+                                                    <i class="ti ti-camera fs-2"></i>
+                                                </div>
+                                            @endif
+                                        </div>
+
+                                        <div class="upload-options-overlay mini rounded-circle">
+                                            <button type="button" title="Select from Media" onclick="openMediaManager('profileImagePath', 'profilePreview')">
+                                                <i class="ti ti-library"></i>
+                                            </button>
+                                            <label for="profileInput" title="Upload New" class="mb-0">
+                                                <i class="ti ti-upload"></i>
+                                            </label>
+                                        </div>
+                                        
+                                        <input type="file" name="profile_image" id="profileInput" hidden accept="image/*" onchange="previewProfileImage(this)">
+                                        <input type="hidden" name="profile_image_path" id="profileImagePath">
+                                    </div>
                                 </div>
                                 <h5 class="fw-bold mb-1">{{ $user->name }}</h5>
                                 <p class="text-muted small">{{ $user->email }}</p>
@@ -101,8 +109,14 @@
                             <div class="card-body px-4">
                                 <div class="row align-items-center">
                                     <div class="col-md-12">
-                                        <input type="file" name="cv_file" class="form-control form-control-sm shadow-none"
-                                            accept=".pdf,.doc,.docx">
+                                        <div class="input-group input-group-sm">
+                                            <button class="btn btn-outline-primary" type="button" onclick="openMediaManager('cvFilePath', 'cvFilePreview')">
+                                                <i class="ti ti-library"></i> Select
+                                            </button>
+                                            <input type="file" name="cv_file" class="form-control shadow-none" accept=".pdf,.doc,.docx">
+                                        </div>
+                                        <input type="hidden" name="cv_file_path" id="cvFilePath">
+                                        <div id="cvFilePreview" class="mt-2"></div>
                                     </div>
                                     @if(isset($user->additional_info['cv']) && $user->additional_info['cv'])
                                         <div class="col-md-12 mt-2 mt-md-0">
@@ -514,12 +528,27 @@
             const list = btn.closest('.document-vault').querySelector('.document-list');
             const docIndex = Date.now();
             const html = `
-                                                                                    <div class="row g-2 mb-2 align-items-center doc-item">
-                                                                                        <div class="col-md-3"><input type="text" name="education_info[${eduIndex}][new_docs][${docIndex}][name]" class="form-control form-control-xs shadow-none" placeholder="Doc Name"></div>
-                                                                                        <div class="col-md-4"><input type="file" name="education_info[${eduIndex}][new_docs][${docIndex}][file]" class="form-control form-control-xs shadow-none"></div>
-                                                                                        <div class="col-md-4"><input type="password" name="education_info[${eduIndex}][new_docs][${docIndex}][password]" class="form-control form-control-xs shadow-none" placeholder="Protect Password"></div>
-                                                                                        <div class="col-md-1 text-end"><button type="button" class="btn btn-sm text-danger p-0" onclick="this.closest('.doc-item').remove()"><i class="ti ti-x"></i></button></div>
-                                                                                    </div>`;
+                <div class="row g-2 mb-2 align-items-center doc-item">
+                    <div class="col-md-3">
+                        <input type="text" name="education_info[${eduIndex}][new_docs][${docIndex}][name]" class="form-control form-control-xs shadow-none" placeholder="Doc Name">
+                    </div>
+                    <div class="col-md-4">
+                        <div class="input-group input-group-xs">
+                            <button class="btn btn-outline-secondary py-0 px-2" type="button" onclick="openMediaManager('eduDocPath_${docIndex}', 'eduDocPreview_${docIndex}')">
+                                <i class="ti ti-library"></i>
+                            </button>
+                            <input type="file" name="education_info[${eduIndex}][new_docs][${docIndex}][file]" class="form-control form-control-xs shadow-none">
+                        </div>
+                        <input type="hidden" name="education_info[${eduIndex}][new_docs][${docIndex}][path]" id="eduDocPath_${docIndex}">
+                        <div id="eduDocPreview_${docIndex}" class="mt-1"></div>
+                    </div>
+                    <div class="col-md-4">
+                        <input type="password" name="education_info[${eduIndex}][new_docs][${docIndex}][password]" class="form-control form-control-xs shadow-none" placeholder="Protect Password">
+                    </div>
+                    <div class="col-md-1 text-end">
+                        <button type="button" class="btn btn-sm text-danger p-0" onclick="this.closest('.doc-item').remove()"><i class="ti ti-x"></i></button>
+                    </div>
+                </div>`;
             list.insertAdjacentHTML('beforeend', html);
         }
 
@@ -527,12 +556,27 @@
             const list = btn.closest('.document-vault').querySelector('.document-list');
             const docIndex = Date.now();
             const html = `
-                                                                                    <div class="row g-2 mb-2 align-items-center doc-item">
-                                                                                        <div class="col-md-3"><input type="text" name="professional_info[${proIndex}][new_docs][${docIndex}][name]" class="form-control form-control-xs shadow-none" placeholder="Doc Name"></div>
-                                                                                        <div class="col-md-4"><input type="file" name="professional_info[${proIndex}][new_docs][${docIndex}][file]" class="form-control form-control-xs shadow-none"></div>
-                                                                                        <div class="col-md-4"><input type="password" name="professional_info[${proIndex}][new_docs][${docIndex}][password]" class="form-control form-control-xs shadow-none" placeholder="Protect Password"></div>
-                                                                                        <div class="col-md-1 text-end"><button type="button" class="btn btn-sm text-danger p-0" onclick="this.closest('.doc-item').remove()"><i class="ti ti-x"></i></button></div>
-                                                                                    </div>`;
+                <div class="row g-2 mb-2 align-items-center doc-item">
+                    <div class="col-md-3">
+                        <input type="text" name="professional_info[${proIndex}][new_docs][${docIndex}][name]" class="form-control form-control-xs shadow-none" placeholder="Doc Name">
+                    </div>
+                    <div class="col-md-4">
+                        <div class="input-group input-group-xs">
+                            <button class="btn btn-outline-secondary py-0 px-2" type="button" onclick="openMediaManager('proDocPath_${docIndex}', 'proDocPreview_${docIndex}')">
+                                <i class="ti ti-library"></i>
+                            </button>
+                            <input type="file" name="professional_info[${proIndex}][new_docs][${docIndex}][file]" class="form-control form-control-xs shadow-none">
+                        </div>
+                        <input type="hidden" name="professional_info[${proIndex}][new_docs][${docIndex}][path]" id="proDocPath_${docIndex}">
+                        <div id="proDocPreview_${docIndex}" class="mt-1"></div>
+                    </div>
+                    <div class="col-md-4">
+                        <input type="password" name="professional_info[${proIndex}][new_docs][${docIndex}][password]" class="form-control form-control-xs shadow-none" placeholder="Protect Password">
+                    </div>
+                    <div class="col-md-1 text-end">
+                        <button type="button" class="btn btn-sm text-danger p-0" onclick="this.closest('.doc-item').remove()"><i class="ti ti-x"></i></button>
+                    </div>
+                </div>`;
             list.insertAdjacentHTML('beforeend', html);
         }
 
@@ -566,5 +610,89 @@
         .btn-extra-sm {
             font-size: 0.7rem;
         }
+
+        .input-group-xs > .form-control,
+        .input-group-xs > .btn {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+        }
+
+        /* Premium Selector Styling */
+        .upload-options-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(2px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 5;
+        }
+
+        .logo-upload-box:hover .upload-options-overlay {
+            opacity: 1;
+        }
+
+        .upload-options-overlay.mini {
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .upload-options-overlay.mini button,
+        .upload-options-overlay.mini label {
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fff;
+            color: #333;
+            border-radius: 50%;
+            border: none;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .upload-options-overlay.mini button:hover,
+        .upload-options-overlay.mini label:hover {
+            background: var(--bs-primary);
+            color: #fff;
+            transform: scale(1.1);
+        }
+        
+        .logo-upload-box {
+            cursor: pointer;
+        }
+        
+        .preview-area {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
     </style>
+    
+    <script>
+        function previewProfileImage(input) {
+            const preview = document.getElementById('image_preview');
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    preview.src = e.target.result;
+                    preview.classList.remove('d-none');
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+    </script>
+    
+    @include('admin.include.media_manager_modal')
 @endsection

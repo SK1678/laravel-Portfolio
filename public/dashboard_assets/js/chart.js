@@ -7,113 +7,75 @@
 
 document.addEventListener('DOMContentLoaded', () => {
     if (document.getElementById('salesPurchaseChart')) {
-         var options = {
-      series: [
-        {
-          name: 'Sales',
-          data: [44, 55, 57, 56, 61, 58, 63, 60, 66],
-        },
-        {
-          name: 'Purchase',
-          data: [76, 85, 101, 98, 87, 105, 91, 114, 94],
-        },
+        const el = document.getElementById('salesPurchaseChart');
+        const selector = document.getElementById('chartPeriodSelector');
+        const initialData = JSON.parse(el.getAttribute('data-initial'));
+        const dataUrl = el.getAttribute('data-url');
 
-      ],
-      colors: ['#f7a085', '#E66239'],
-      chart: {
-        type: 'bar',
-        height: 350,
-        width: '100%',
-        parentHeightOffset: 0,
-        toolbar: {
-          show: false,
-        },
-      },
-      grid: {
-        show: true,
-        borderColor: "#e2e8f0",
+        let chart;
 
-      },
-      legend: {
-        show: true,
-        fontFamily: 'Poppins, serif',
-        fontWeight: 500,
-        markers: {
-          size: 5,
-          shape: 'square',
-          strokeWidth: 0,
-          fillColors: undefined,
-          customHTML: undefined,
-          onClick: undefined,
-          offsetX: -2,
-          offsetY: 0,
-        },
-      },
-      plotOptions: {
-        bar: {
-          horizontal: false,
-          columnWidth: '85%',
-          borderRadius: 3,
-          borderRadiusApplication: 'end',
-        },
-      },
-      dataLabels: {
-        enabled: false,
-      },
-      stroke: {
-        show: false,
-        width: 2,
-        colors: ['transparent'],
-      },
-      xaxis: {
-        categories: ['28 Jan', '29 Jan', '30 Jan', '31 Jan', '1 Feb', '2 Feb', '3 Feb', '4 Feb', '5 Feb'],
-        axisBorder: {
-          show: false,
-          color: "#e2e8f0",
-          height: 1,
-          width: '100%',
-          offsetX: 0,
-          offsetY: 0,
-        },
-        axisTicks: {
-          show: false,
-          borderType: 'solid',
-          color: "#e2e8f0",
-          height: 6,
-          offsetX: 0,
-          offsetY: 0,
-        },
-      },
+        function renderChart(data) {
+            const options = {
+                series: [
+                    { name: 'Views', data: data.views },
+                    { name: 'Clicks', data: data.clicks },
+                ],
+                colors: ['#E66239', '#5BE49B'],
+                chart: {
+                    type: 'bar',
+                    height: 350,
+                    toolbar: { show: false },
+                    animations: { enabled: true }
+                },
+                plotOptions: {
+                    bar: {
+                        horizontal: false,
+                        columnWidth: '55%',
+                        borderRadius: 5,
+                    },
+                },
+                dataLabels: { enabled: false },
+                xaxis: { categories: data.labels },
+                yaxis: { title: { text: 'Count' } },
+                tooltip: {
+                    y: {
+                        formatter: (val) => val + " total"
+                    }
+                }
+            };
 
-      yaxis: {
-        labels: {
-          formatter: function (e) {
-            return e + 'k';
-          },
-        },
-        title: {
-          text: '$ (thousands)' ,
-        },
-      },
-      fill: {
-        opacity: 1,
-      },
-     tooltip: {
-    			y: {
-    				formatter: function (val) {
-    					return "$ " + val + " thousands"
-    				}
-    			}
-    		},
-    };
+            if (chart) {
+                chart.updateOptions(options);
+            } else {
+                chart = new ApexCharts(el, options);
+                chart.render();
+            }
+        }
 
-var chart = new ApexCharts(document.querySelector("#salesPurchaseChart"), options);
+        // Initial render
+        renderChart(initialData);
 
-chart.render();
+        // Listen for period changes
+        selector.addEventListener('change', function() {
+            const period = this.value;
+            fetch(`${dataUrl}?period=${period}`)
+                .then(res => res.json())
+                .then(data => renderChart(data))
+                .catch(err => console.error('Error fetching chart data:', err));
+        });
     }
       if (document.getElementById('customerChart')) {
+    var element = document.getElementById('customerChart');
+    var firstTime = parseInt(element.getAttribute('data-first')) || 0;
+    var returnTime = parseInt(element.getAttribute('data-return')) || 0;
+
+    // Avoid 0/0 resulting in empty chart if no data yet
+    if (firstTime === 0 && returnTime === 0) {
+      firstTime = 1; // Show empty but initialized
+    }
+
     var options = {
-      series: [44, 55],
+      series: [firstTime, returnTime],
       chart: {
         height: 200,
         type: 'radialBar',

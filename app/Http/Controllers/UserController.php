@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use App\Models\User;
+use App\Models\Media;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -92,15 +94,21 @@ class UserController extends Controller
         $data['is_site_owner'] = $request->has('is_site_owner');
 
         // Handle Image Upload
+        if ($request->filled('profile_image_path')) {
+            $data['profile_image'] = $request->input('profile_image_path');
+        }
         if ($request->hasFile('profile_image')) {
-            $data['profile_image'] = $request->file('profile_image')->store('profiles', 'public');
+            $file = $request->file('profile_image');
+            $path = $file->store('profiles', 'public');
+            $this->registerMedia($file, $path);
+            $data['profile_image'] = $path;
         }
 
-        // Handle Dynamic Information (JSON)
-        $education = array_values($request->input('education_info', []));
-        $allFiles = $request->file('education_info', []);
+        // Handle Dynamic Education Information
+        $educationData = $request->input('education_info', []);
+        $education = [];
 
-        foreach ($education as $idx => &$edu) {
+        foreach ($educationData as $key => $edu) {
             $docs = [];
             
             // Preserve existing docs
@@ -109,62 +117,88 @@ class UserController extends Controller
                 unset($edu['existing_docs']);
             }
 
-            // Handle New Document Uploads
-            if (isset($allFiles[$idx]['new_docs'])) {
-                $newDocsData = $request->input("education_info.{$idx}.new_docs", []);
-                $newDocsFiles = $allFiles[$idx]['new_docs'];
-                
-                foreach ($newDocsFiles as $docIdx => $fileWrapper) {
-                    if (isset($fileWrapper['file']) && $fileWrapper['file']->isValid()) {
-                        $file = $fileWrapper['file'];
-                        $path = $file->store('education_docs', 'public');
-                        $docs[] = [
-                            'name' => $newDocsData[$docIdx]['name'] ?? $file->getClientOriginalName(),
-                            'path' => $path,
-                            'password' => $newDocsData[$docIdx]['password'] ?? null
-                        ];
-                    }
+            // Handle New Document Uploads or Selections
+            $newDocsData = $edu['new_docs'] ?? [];
+            $newDocsFiles = $request->file("education_info.{$key}.new_docs", []);
+            
+            foreach ($newDocsData as $docIdx => $docData) {
+                if (isset($newDocsFiles[$docIdx]['file']) && $newDocsFiles[$docIdx]['file']->isValid()) {
+                    $file = $newDocsFiles[$docIdx]['file'];
+                    $path = $file->store('education_docs', 'public');
+                    $this->registerMedia($file, $path);
+                    $docs[] = [
+                        'name' => $docData['name'] ?? $file->getClientOriginalName(),
+                        'path' => $path,
+                        'password' => $docData['password'] ?? null
+                    ];
+                } elseif (!empty($docData['path'])) {
+                    $path = $docData['path'];
+                    $docs[] = [
+                        'name' => $docData['name'] ?? basename($path),
+                        'path' => $path,
+                        'password' => $docData['password'] ?? null
+                    ];
                 }
             }
             $edu['documents'] = $docs;
-            unset($edu['new_docs']); // Clean up request data
+            unset($edu['new_docs']); 
+            $education[] = $edu;
         }
 
         // Handle Professional Information (JSON)
-        $professional = array_values($request->input('professional_info', []));
-        $allProFiles = $request->file('professional_info', []);
+        $professionalData = $request->input('professional_info', []);
+        $professional = [];
 
-        foreach ($professional as $idx => &$pro) {
-            // ... (keep existing docs processing) ...
+        foreach ($professionalData as $key => $pro) {
             $docs = [];
+            
+            // Preserve existing docs
             if (isset($pro['existing_docs'])) {
                 $docs = array_values($pro['existing_docs']);
                 unset($pro['existing_docs']);
             }
-            if (isset($allProFiles[$idx]['new_docs'])) {
-                $newDocsData = $request->input("professional_info.{$idx}.new_docs", []);
-                $newDocsFiles = $allProFiles[$idx]['new_docs'];
-                foreach ($newDocsFiles as $docIdx => $fileWrapper) {
-                    if (isset($fileWrapper['file']) && $fileWrapper['file']->isValid()) {
-                        $file = $fileWrapper['file'];
-                        $path = $file->store('professional_docs', 'public');
-                        $docs[] = [
-                            'name' => $newDocsData[$docIdx]['name'] ?? $file->getClientOriginalName(),
-                            'path' => $path,
-                            'password' => $newDocsData[$docIdx]['password'] ?? null
-                        ];
-                    }
+
+            // Handle New Document Uploads or Selections
+            $newDocsData = $pro['new_docs'] ?? [];
+            $newDocsFiles = $request->file("professional_info.{$key}.new_docs", []);
+            
+            foreach ($newDocsData as $docIdx => $docData) {
+                if (isset($newDocsFiles[$docIdx]['file']) && $newDocsFiles[$docIdx]['file']->isValid()) {
+                    $file = $newDocsFiles[$docIdx]['file'];
+                    $path = $file->store('professional_docs', 'public');
+                    $this->registerMedia($file, $path);
+                    $docs[] = [
+                        'name' => $docData['name'] ?? $file->getClientOriginalName(),
+                        'path' => $path,
+                        'password' => $docData['password'] ?? null
+                    ];
+                } elseif (!empty($docData['path'])) {
+                    $path = $docData['path'];
+                    $docs[] = [
+                        'name' => $docData['name'] ?? basename($path),
+                        'path' => $path,
+                        'password' => $docData['password'] ?? null
+                    ];
                 }
             }
             $pro['documents'] = $docs;
             unset($pro['new_docs']);
+            $professional[] = $pro;
         }
 
         // Handle CV Upload
         $cvData = $user->additional_info['cv'] ?? null;
+        if ($request->filled('cv_file_path')) {
+            $path = $request->input('cv_file_path');
+            $cvData = [
+                'name' => basename($path),
+                'path' => $path
+            ];
+        }
         if ($request->hasFile('cv_file') && $request->file('cv_file')->isValid()) {
             $file = $request->file('cv_file');
             $path = $file->store('cv_docs', 'public');
+            $this->registerMedia($file, $path);
             $cvData = [
                 'name' => $file->getClientOriginalName(),
                 'path' => $path
@@ -182,6 +216,32 @@ class UserController extends Controller
         $user->update($data);
 
         return redirect()->route('user.show', $user->id)->with('success', 'User updated successfully.');
+    }
+
+    /**
+     * Register a new file in the Media Library.
+     */
+    private function registerMedia($file, $path)
+    {
+        $originalName = $file->getClientOriginalName();
+        $mime = $file->getMimeType();
+        $type = 'document';
+        
+        if (str_starts_with($mime, 'image/')) $type = 'image';
+        elseif (str_starts_with($mime, 'video/')) $type = 'video';
+        elseif (str_starts_with($mime, 'audio/')) $type = 'audio';
+        elseif (str_starts_with($mime, 'application/pdf')) $type = 'pdf';
+        elseif (str_contains($mime, 'zip') || str_contains($mime, 'rar')) $type = 'archive';
+
+        return Media::create([
+            'filename' => basename($path),
+            'original_name' => $originalName,
+            'file_path' => $path,
+            'file_size' => $file->getSize(),
+            'mime_type' => $mime,
+            'type' => $type,
+            'user_id' => Auth::id(),
+        ]);
     }
 
     /**

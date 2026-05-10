@@ -1,16 +1,13 @@
 <?php $__env->startSection('content'); ?>
     <div class="container-fluid">
-        <div class="row page-titles">
-            <div class="col-md-5 align-self-center">
+        <div class="row page-titles mb-4">
+            <div class="col-md-8 align-self-center">
                 <h4 class="text-themecolor">Services Manager</h4>
             </div>
-            <div class="col-md-7 align-self-center text-end">
-                <div class="d-flex justify-content-end align-items-center">
-                    <ol class="breadcrumb justify-content-end">
-                        <li class="breadcrumb-item"><a href="<?php echo e(route('dashboard')); ?>">Home</a></li>
-                        <li class="breadcrumb-item active">Services</li>
-                    </ol>
-                </div>
+            <div class="col-sm-6 col-md-4 p-md-0 justify-content-sm-end mt-2 mt-sm-0 d-flex align-items-center">
+                <a href="<?php echo e(route('page')); ?>" class="btn btn-light btn-sm px-3 border shadow-sm">
+                    <i class="ti ti-arrow-left me-1"></i> Back
+                </a>
             </div>
         </div>
 
@@ -41,7 +38,8 @@
                     <?php $__currentLoopData = $services; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $service): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <div class="card service-card mb-3 position-relative" data-index="<?php echo e($index); ?>">
                             <div class="card-body">
-                                <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2 remove-service">
+                                <button type="button"
+                                    class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2 remove-service">
                                     <i class="ti ti-x"></i>
                                 </button>
                                 <input type="hidden" name="services[<?php echo e($index); ?>][id]" value="<?php echo e($service->id); ?>">
@@ -54,14 +52,16 @@
                                     <div class="col-md-4 mb-3">
                                         <label class="form-label small fw-bold">Icon Class (Bootstrap Icons)</label>
                                         <div class="input-group">
-                                            <span class="input-group-text bg-light"><i class="bi <?php echo e($service->icon ?? 'bi-briefcase'); ?>"></i></span>
+                                            <span class="input-group-text bg-light"><i
+                                                    class="bi <?php echo e($service->icon ?? 'bi-briefcase'); ?>"></i></span>
                                             <input type="text" name="services[<?php echo e($index); ?>][icon]" class="form-control icon-input"
                                                 value="<?php echo e($service->icon); ?>" placeholder="e.g. bi-activity">
                                         </div>
                                     </div>
                                     <div class="col-md-12 mb-3">
                                         <label class="form-label small fw-bold">Description</label>
-                                        <textarea name="services[<?php echo e($index); ?>][description]" class="form-control" rows="2" placeholder="Describe the service..."><?php echo e($service->description); ?></textarea>
+                                        <textarea name="services[<?php echo e($index); ?>][description]" class="form-control" rows="2"
+                                            placeholder="Describe the service..."><?php echo e($service->description); ?></textarea>
                                     </div>
                                 </div>
                             </div>
@@ -88,100 +88,101 @@
             border: 1px solid #eee;
             transition: all 0.3s ease;
         }
+
         .service-card:hover {
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
         }
+
         .border-dashed {
             border-style: dashed !important;
         }
     </style>
 
-<?php $__env->startPush('scripts'); ?>
-    <script>
-        $(document).ready(function() {
-            let serviceIndex = <?php echo e(count($services)); ?>;
+    <?php $__env->startPush('scripts'); ?>
+        <script>
+            $(document).ready(function () {
+                let serviceIndex = <?php echo e(count($services)); ?>;
 
-            // Add Service
-            $('#addService').click(function() {
-                const html = `
-                <div class="card service-card mb-3 position-relative" data-index="${serviceIndex}">
-                    <div class="card-body">
-                        <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2 remove-service">
-                            <i class="ti ti-x"></i>
-                        </button>
-                        <div class="row">
-                            <div class="col-md-4 mb-3">
-                                <label class="form-label small fw-bold">Service Title</label>
-                                <input type="text" name="services[${serviceIndex}][title]" class="form-control" placeholder="e.g. App Design">
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <label class="form-label small fw-bold">Icon Class</label>
-                                <div class="input-group">
-                                    <span class="input-group-text bg-light"><i class="bi bi-briefcase"></i></span>
-                                    <input type="text" name="services[${serviceIndex}][icon]" class="form-control icon-input" placeholder="e.g. bi-cpu">
-                                </div>
-                            </div>
-                            <div class="col-md-12 mb-3">
-                                <label class="form-label small fw-bold">Description</label>
-                                <textarea name="services[${serviceIndex}][description]" class="form-control" rows="2" placeholder="Describe the service..."></textarea>
-                            </div>
-                        </div>
-                    </div>
-                </div>`;
-                $('#servicesContainer').append(html);
-                serviceIndex++;
-            });
-
-            // Remove Service
-            $(document).on('click', '.remove-service', function() {
-                $(this).closest('.service-card').fadeOut(300, function() {
-                    $(this).remove();
-                });
-            });
-
-            // Update Icon Preview
-            $(document).on('input', '.icon-input', function() {
-                const icon = $(this).val();
-                $(this).closest('.input-group').find('i').attr('class', 'bi ' + icon);
-            });
-
-            // Submit Form
-            $('#servicesForm').on('submit', function(e) {
-                e.preventDefault();
-                const formData = $(this).serialize();
-
-                Swal.fire({
-                    title: 'Saving...',
-                    allowOutsideClick: false,
-                    didOpen: () => { Swal.showLoading(); }
+                // Add Service
+                $('#addService').click(function () {
+                    const html = `
+                                        <div class="card service-card mb-3 position-relative" data-index="${serviceIndex}">
+                                            <div class="card-body">
+                                                <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2 remove-service">
+                                                    <i class="ti ti-x"></i>
+                                                </button>
+                                                <div class="row">
+                                                    <div class="col-md-4 mb-3">
+                                                        <label class="form-label small fw-bold">Service Title</label>
+                                                        <input type="text" name="services[${serviceIndex}][title]" class="form-control" placeholder="e.g. App Design">
+                                                    </div>
+                                                    <div class="col-md-4 mb-3">
+                                                        <label class="form-label small fw-bold">Icon Class</label>
+                                                        <div class="input-group">
+                                                            <span class="input-group-text bg-light"><i class="bi bi-briefcase"></i></span>
+                                                            <input type="text" name="services[${serviceIndex}][icon]" class="form-control icon-input" placeholder="e.g. bi-cpu">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-12 mb-3">
+                                                        <label class="form-label small fw-bold">Description</label>
+                                                        <textarea name="services[${serviceIndex}][description]" class="form-control" rows="2" placeholder="Describe the service..."></textarea>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>`;
+                    $('#servicesContainer').append(html);
+                    serviceIndex++;
                 });
 
-                $.ajax({
-                    url: "<?php echo e(route('admin.services.save')); ?>",
-                    method: 'POST',
-                    data: formData,
-                    success: function(res) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Saved!',
-                            text: res.message,
-                            timer: 1500
-                        }).then(() => {
-                            window.location.reload();
-                        });
-                    },
-                    error: function(xhr) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: 'Something went wrong!'
-                        });
-                    }
+                // Remove Service
+                $(document).on('click', '.remove-service', function () {
+                    $(this).closest('.service-card').fadeOut(300, function () {
+                        $(this).remove();
+                    });
+                });
+
+                // Update Icon Preview
+                $(document).on('input', '.icon-input', function () {
+                    const icon = $(this).val();
+                    $(this).closest('.input-group').find('i').attr('class', 'bi ' + icon);
+                });
+
+                // Submit Form
+                $('#servicesForm').on('submit', function (e) {
+                    e.preventDefault();
+                    const formData = $(this).serialize();
+
+                    Swal.fire({
+                        title: 'Saving...',
+                        allowOutsideClick: false,
+                        didOpen: () => { Swal.showLoading(); }
+                    });
+
+                    $.ajax({
+                        url: "<?php echo e(route('admin.services.save')); ?>",
+                        method: 'POST',
+                        data: formData,
+                        success: function (res) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Saved!',
+                                text: res.message,
+                                timer: 1500
+                            }).then(() => {
+                                window.location.reload();
+                            });
+                        },
+                        error: function (xhr) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'Something went wrong!'
+                            });
+                        }
+                    });
                 });
             });
-        });
-    </script>
-<?php $__env->stopPush(); ?>
+        </script>
+    <?php $__env->stopPush(); ?>
 <?php $__env->stopSection(); ?>
-
 <?php echo $__env->make('admin.layouts.admin', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH E:\LocalServer\htdocs\myPortfolio\resources\views/admin/pages/service_settings.blade.php ENDPATH**/ ?>

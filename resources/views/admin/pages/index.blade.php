@@ -3,19 +3,13 @@
 @section('title', 'Page Configurations')
 
 @section('content')
-    <div class="container-fluid">
-        <div class="row page-titles mx-0">
+    <div class="container-fluid ">
+        <div class="row page-titles mx-0 mb-4">
             <div class="col-sm-6 p-md-0">
                 <div class="welcome-text">
-                    <h4>Page Configurations</h4>
-                    <p class="mb-3 text-muted">Manage your landing page sections</p>
+                    <h4>Utility Widgets</h4>
+                    <p class="mb-3 text-muted">Explore the CMS widgets</p>
                 </div>
-            </div>
-            <div class="col-sm-6 p-md-0 justify-content-sm-end mt-2 mt-sm-0 d-flex">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-                    <li class="breadcrumb-item active"><a href="javascript:void(0)">Page Configurations</a></li>
-                </ol>
             </div>
         </div>
 
@@ -99,9 +93,20 @@
                 </div>
             </div>
 
-            <!-- Messages Section Card -->
+            <!-- Unified Messages Section Card -->
             <div class="col-xl-2 col-lg-3 col-md-4 col-6">
-                <div class="section-card shadow-sm border-0">
+                <div class="section-card shadow-sm border-0 position-relative">
+                    @php
+                        $unreadGuestMsgs = \App\Models\Message::where('is_read', false)->count();
+                        $unreadChats = \App\Models\ChatMessage::where('receiver_id', auth()->id())->where('is_read', false)->count();
+                        $totalUnifiedUnread = $unreadGuestMsgs + $unreadChats;
+                    @endphp
+                    @if($totalUnifiedUnread > 0)
+                        <span class="position-absolute badge rounded-pill bg-danger"
+                            style="top: 15px; right: 15px; font-size: 0.75rem; padding: 5px 8px; z-index: 10;">
+                            {{ $totalUnifiedUnread }}
+                        </span>
+                    @endif
                     <a href="{{ route('admin.messages') }}"
                         class="text-center w-100 h-100 d-flex flex-column align-items-center justify-content-center p-4">
                         <div class="section-icon-container bg-light-success text-success mb-3">
@@ -112,19 +117,63 @@
                 </div>
             </div>
 
-
-
-
-
-            <!-- Blogs Section Card -->
+            <!-- Posts Section Card -->
             <div class="col-xl-2 col-lg-3 col-md-4 col-6">
                 <div class="section-card shadow-sm border-0">
-                    <a href="javascript:void(0)"
+                    <a href="{{ route('admin.posts') }}"
                         class="text-center w-100 h-100 d-flex flex-column align-items-center justify-content-center p-4">
-                        <div class="section-icon-container bg-light-danger text-danger mb-3">
+                        <div class="section-icon-container bg-light-primary text-primary mb-3">
                             <i class="ti ti-news fs-1"></i>
                         </div>
-                        <h6 class="fw-bold mb-0">Blogs</h6>
+                        <h6 class="fw-bold mb-0">Posts</h6>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Media Library Section Card -->
+            <div class="col-xl-2 col-lg-3 col-md-4 col-6">
+                <div class="section-card shadow-sm border-0">
+                    <a href="{{ route('admin.media') }}"
+                        class="text-center w-100 h-100 d-flex flex-column align-items-center justify-content-center p-4">
+                        <div class="section-icon-container bg-light-info text-info mb-3">
+                            <i class="ti ti-photo fs-1"></i>
+                        </div>
+                        <h6 class="fw-bold mb-0">Media Library</h6>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Categories Section Card -->
+            <div class="col-xl-2 col-lg-3 col-md-4 col-6">
+                <div class="section-card shadow-sm border-0">
+                    <a href="{{ route('admin.categories') }}"
+                        class="text-center w-100 h-100 d-flex flex-column align-items-center justify-content-center p-4">
+                        <div class="section-icon-container bg-light-danger text-danger mb-3">
+                            <i class="ti ti-category fs-1"></i>
+                        </div>
+                        <h6 class="fw-bold mb-0">Categories</h6>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Comment Manager Section Card -->
+            <div class="col-xl-2 col-lg-3 col-md-4 col-6">
+                <div class="section-card shadow-sm border-0 position-relative">
+                    @php
+                        $unreadComments = \App\Models\Comment::where('is_read', false)->count();
+                    @endphp
+                    @if($unreadComments > 0)
+                        <span class="position-absolute badge rounded-pill bg-danger"
+                            style="top: 15px; right: 15px; font-size: 0.75rem; padding: 5px 8px; z-index: 10;">
+                            {{ $unreadComments }}
+                        </span>
+                    @endif
+                    <a href="{{ route('admin.comments') }}"
+                        class="text-center w-100 h-100 d-flex flex-column align-items-center justify-content-center p-4">
+                        <div class="section-icon-container bg-light-primary text-primary mb-3">
+                            <i class="ti ti-message-dots fs-1"></i>
+                        </div>
+                        <h6 class="fw-bold mb-0">Comments</h6>
                     </a>
                 </div>
             </div>

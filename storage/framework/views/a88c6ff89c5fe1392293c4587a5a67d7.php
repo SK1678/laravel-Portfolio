@@ -48,17 +48,12 @@
                 <a href=""><i class="bi bi-linkedin"></i></a>
             <?php endif; ?>
         </div>
-        <div class="credits">
-            <!-- All the links in the footer should remain intact. -->
-            <!-- You can delete the links only if you've purchased the pro version. -->
-            <!-- Licensing information: https://bootstrapmade.com/license/ -->
-            <!-- Purchase the pro version with working PHP/AJAX contact form: [buy-url] -->
-            Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a> Distributed by <a
-                href=“https://themewagon.com>ThemeWagon
-        </div>
+
     </div>
 
 </footer>
+
+<?php echo $__env->make('frontend.include.chat_widget', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
 <!-- Scroll Top -->
 <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i
@@ -68,15 +63,33 @@
 <div id="preloader"></div>
 
 <!-- Vendor JS Files -->
-<script src="UI/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-<script src="UI/assets/vendor/php-email-form/validate.js"></script>
-<script src="UI/assets/vendor/aos/aos.js"></script>
-<script src="UI/assets/vendor/waypoints/noframework.waypoints.js"></script>
-<script src="UI/assets/vendor/purecounter/purecounter_vanilla.js"></script>
-<script src="UI/assets/vendor/swiper/swiper-bundle.min.js"></script>
-<script src="UI/assets/vendor/glightbox/js/glightbox.min.js"></script>
-<script src="UI/assets/vendor/imagesloaded/imagesloaded.pkgd.min.js"></script>
-<script src="UI/assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+<script src="<?php echo e(asset('UI/assets/vendor/bootstrap/js/bootstrap.bundle.min.js')); ?>"></script>
+<script src="<?php echo e(asset('UI/assets/vendor/php-email-form/validate.js')); ?>"></script>
+<script src="<?php echo e(asset('UI/assets/vendor/aos/aos.js')); ?>"></script>
+<script src="<?php echo e(asset('UI/assets/vendor/waypoints/noframework.waypoints.js')); ?>"></script>
+<script src="<?php echo e(asset('UI/assets/vendor/purecounter/purecounter_vanilla.js')); ?>"></script>
+<script src="<?php echo e(asset('UI/assets/vendor/swiper/swiper-bundle.min.js')); ?>"></script>
+<script src="<?php echo e(asset('UI/assets/vendor/glightbox/js/glightbox.min.js')); ?>"></script>
+<script src="<?php echo e(asset('UI/assets/vendor/imagesloaded/imagesloaded.pkgd.min.js')); ?>"></script>
+<script src="<?php echo e(asset('UI/assets/vendor/isotope-layout/isotope.pkgd.min.js')); ?>"></script>
 
 <!-- Main JS File -->
-<script src="UI/assets/js/main.js"></script><?php /**PATH E:\LocalServer\htdocs\myPortfolio\resources\views/frontend/include/footer.blade.php ENDPATH**/ ?>
+<script src="<?php echo e(asset('UI/assets/js/main.js')); ?>"></script>
+
+<script>
+    document.addEventListener('click', function(e) {
+        const target = e.target.closest('a, button');
+        if (target) {
+            fetch('<?php echo e(route("track.click")); ?>', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>'
+                },
+                body: JSON.stringify({ 
+                    url: target.href || 'button' 
+                })
+            }).catch(err => console.error('Click tracking failed', err));
+        }
+    });
+</script><?php /**PATH E:\LocalServer\htdocs\myPortfolio\resources\views/frontend/include/footer.blade.php ENDPATH**/ ?>

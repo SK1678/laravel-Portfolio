@@ -47,9 +47,13 @@ class SettingsController extends Controller
             'dark_accent_color' => 'nullable|string|max:7',
             'dark_surface_color'=> 'nullable|string|max:7',
             'dark_contrast_color'=>'nullable|string|max:7',
+            'contact_mail'      => 'nullable|email|max:255',
+            'contact_no'        => 'nullable|string|max:50',
+            'address'           => 'nullable|string|max:500',
+            'map_link'          => 'nullable|string',
         ]);
 
-        $data = $request->except(['_token', 'favicon', 'logo_image', 'remove_logo', 'remove_favicon']);
+        $data = $request->except(['_token', 'favicon', 'logo_image', 'remove_logo', 'remove_favicon', 'logo_image_path', 'favicon_path']);
         $data['is_dark_mode'] = $request->boolean('is_dark_mode');
 
         // Handle logo removal
@@ -62,14 +66,24 @@ class SettingsController extends Controller
             $data['favicon'] = null;
         }
 
-        // Handle favicon upload
+        // Handle favicon path from media library
+        if ($request->filled('favicon_path')) {
+            $data['favicon'] = $request->favicon_path;
+        }
+
+        // Handle favicon upload (overrides selected path if file is provided)
         if ($request->hasFile('favicon')) {
             $request->validate(['favicon' => 'image|mimes:png,jpg,ico|max:512']);
             $path = $request->file('favicon')->store('settings', 'public');
             $data['favicon'] = $path;
         }
 
-        // Handle logo image upload
+        // Handle logo image path from media library
+        if ($request->filled('logo_image_path')) {
+            $data['logo_image'] = $request->logo_image_path;
+        }
+
+        // Handle logo image upload (overrides selected path if file is provided)
         if ($request->hasFile('logo_image')) {
             $request->validate(['logo_image' => 'image|mimes:png,jpg,svg|max:1024']);
             $path = $request->file('logo_image')->store('settings', 'public');

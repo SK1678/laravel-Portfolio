@@ -23,7 +23,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
     <link rel="stylesheet" href="<?php echo e(asset('/dashboard_assets/css/style.css')); ?>">
-    
+
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -46,6 +46,7 @@
             font-weight: 500;
         }
     </style>
+    <?php echo $__env->yieldPushContent('styles'); ?>
 </head>
 <div id="overlay" class="overlay"></div>
 <!-- TOPBAR -->
@@ -75,50 +76,76 @@
                             d="M10 5a2 2 0 1 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6" />
                         <path d="M9 17v1a3 3 0 0 0 6 0v-1" />
                     </svg>
-                    <span
-                        class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger mt-2 ms-n2">
-                        2
-                        <span class="visually-hidden">unread messages</span>
-                    </span>
-                </a>
-                <div class="dropdown-menu dropdown-menu-end dropdown-menu-md p-0">
-                    <ul class="list-unstyled p-0 m-0">
-                        <li class="p-3 border-bottom ">
-                            <div class="d-flex gap-3">
-                                <img src="<?php echo e(asset('Dashboard/assets/images/avatar/avatar-1.jpg')); ?>" alt=""
-                                    class="avatar avatar-sm rounded-circle" />
-                                <div class="flex-grow-1 small">
-                                    <p class="mb-0">New order received</p>
-                                    <p class="mb-1">Order #12345 has been placed</p>
-                                    <div class="text-secondary">5 minutes ago</div>
-                                </div>
-                            </div>
-                        </li>
-                        <li class="p-3 border-bottom ">
-                            <div class="d-flex gap-3">
-                                <img src="<?php echo e(asset('Dashboard/assets/images/avatar/avatar-4.jpg')); ?>" alt=""
-                                    class="avatar avatar-sm rounded-circle" />
-                                <div class="flex-grow-1 small">
-                                    <p class="mb-0">New user registered</p>
-                                    <p class="mb-1">User @john_doe has signed up</p>
-                                    <div class="text-secondary">30 minutes ago</div>
-                                </div>
-                        </li>
+                    <?php if($totalUnread > 0): ?>
+                        <span
+                            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger mt-2 ms-n2"
+                            style="font-size: 0.6rem;">
+                            <?php echo e($totalUnread); ?>
 
-                        <li class="p-3 border-bottom">
-                            <div class="d-flex gap-3">
-                                <img src="<?php echo e(asset('Dashboard/assets/images/avatar/avatar-2.jpg')); ?>" alt=""
-                                    class="avatar avatar-sm rounded-circle" />
-                                <div class="flex-grow-1 small">
-                                    <p class="mb-0">Payment confirmed</p>
-                                    <p class="mb-1">Payment of $299 has been received</p>
-                                    <div class="text-secondary">1 hour ago</div>
-                                </div>
-                            </div>
-                        </li>
-                        <li class="px-4 py-3 text-center">
-                            <a href="#" class="text-primary ">View all notifications</a>
-                        </li>
+                            <span class="visually-hidden">unread notifications</span>
+                        </span>
+                    <?php endif; ?>
+                </a>
+                <div class="dropdown-menu dropdown-menu-end dropdown-menu-md p-0"
+                    style="min-width: 320px; border: none; shadow: 0 10px 15px -3px rgba(0,0,0,0.1);">
+                    <ul class="list-unstyled p-0 m-0">
+                        <?php $__empty_1 = true; $__currentLoopData = $notifications; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $notif): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                            <li class="p-3 border-bottom notification-item"
+                                style="transition: background 0.2s; <?php echo e(!$notif->is_read ? 'background-color: #fff5f5;' : ''); ?>">
+                                <?php if($notif->notif_type == 'comment'): ?>
+                                    <a href="<?php echo e(route('blog.show', $notif->post->slug)); ?>" target="_blank"
+                                        class="text-decoration-none text-dark d-flex gap-3 notification-link"
+                                        data-id="<?php echo e($notif->id); ?>" data-type="comment">
+                                        <div class="flex-grow-1">
+                                            <p class="mb-0 fw-bold text-dark" style="font-size: 0.85rem;">
+                                                <?php echo e($notif->user->name); ?> commented
+                                            </p>
+                                            <p class="mb-1 text-muted" style="font-size: 0.8rem; line-height: 1.3;">
+                                                "<?php echo e(Str::limit($notif->body, 65)); ?>"</p>
+                                            <div class="text-secondary d-flex align-items-center gap-1"
+                                                style="font-size: 0.7rem;">
+                                                <i class="ti ti-clock" style="font-size: 0.8rem;"></i>
+                                                <?php echo e($notif->created_at->diffForHumans()); ?>
+
+                                            </div>
+                                        </div>
+                                    </a>
+                                <?php else: ?>
+                                    <a href="<?php echo e(route('admin.messages')); ?>"
+                                        class="text-decoration-none text-dark d-flex gap-3 notification-link"
+                                        data-id="<?php echo e($notif->id); ?>" data-type="message">
+                                        <div class="flex-grow-1">
+                                            <p class="mb-0 fw-bold text-danger" style="font-size: 0.85rem;">New Message from
+                                                <?php echo e($notif->name); ?>
+
+                                            </p>
+                                            <p class="mb-1 text-muted" style="font-size: 0.8rem; line-height: 1.3;">Subject:
+                                                <?php echo e(Str::limit($notif->subject, 50)); ?>
+
+                                            </p>
+                                            <div class="text-secondary d-flex align-items-center gap-1"
+                                                style="font-size: 0.7rem;">
+                                                <i class="ti ti-clock" style="font-size: 0.8rem;"></i>
+                                                <?php echo e($notif->created_at->diffForHumans()); ?>
+
+                                            </div>
+                                        </div>
+                                    </a>
+                                <?php endif; ?>
+                            </li>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                            <li class="p-4 text-center">
+                                <i class="ti ti-bell-off text-muted fs-2"></i>
+                                <p class="mb-0 text-muted mt-2">No new notifications</p>
+                            </li>
+                        <?php endif; ?>
+
+                        <?php if(auth()->check() && auth()->id() == $siteOwner->id && $notifications->count() > 0): ?>
+                            <li class="p-2 text-center">
+                                <a class="text-danger small fw-bold text-decoration-none" href="<?php echo e(route('page')); ?>">View
+                                    all notifications</a>
+                            </li>
+                        <?php endif; ?>
                     </ul>
                 </div>
             </li>
@@ -131,6 +158,46 @@
     </div>
 
 </nav>
+
+<?php $__env->startPush('scripts'); ?>
+    <script>
+        $(document).ready(function () {
+            $(document).on('click', '.notification-link', function (e) {
+                const $link = $(this);
+                const id = $link.data('id');
+                const type = $link.data('type');
+                const $item = $link.closest('.notification-item');
+                const $badge = $('.badge.rounded-pill.bg-danger');
+
+                if ($item.css('background-color') !== 'rgba(0, 0, 0, 0)') {
+                    let markReadUrl = type === 'message'
+                        ? "<?php echo e(route('admin.messages.markAsRead', ':id')); ?>".replace(':id', id)
+                        : "<?php echo e(route('admin.comments.markAsRead', ':id')); ?>".replace(':id', id);
+
+                    $.ajax({
+                        url: markReadUrl,
+                        type: 'POST',
+                        data: { _token: '<?php echo e(csrf_token()); ?>' },
+                        success: function (response) {
+                            if (response.success) {
+                                $item.css('background-color', 'transparent');
+                                let countText = $badge.text().trim();
+                                if (countText) {
+                                    let count = parseInt(countText);
+                                    if (count > 1) {
+                                        $badge.text(count - 1);
+                                    } else {
+                                        $badge.fadeOut(300, function () { $(this).remove(); });
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+<?php $__env->stopPush(); ?>
 
 
 <!-- SIDEBAR -->
@@ -147,24 +214,15 @@
                     class="nav-text">Home</span></a></li>
         <li class="px-4 py-2"><small class="nav-text text-muted">Main</small></li>
 
-        <li><a class="nav-link <?php echo e((request()->routeIs('dashboard') || request()->is('dashboard*')) ? 'active' : ''); ?>"
+        <li><a class="nav-link <?php echo e((request()->routeIs('dashboard') || (request()->is('dashboard*') && !request()->is('dashboard/chats*'))) ? 'active' : ''); ?>"
                 href="<?php echo e(route('dashboard')); ?>"><i class="ti ti-home"></i><span class="nav-text">Dashboard</span></a>
         </li>
         <li><a class="nav-link <?php echo e((request()->routeIs('settings.global') || request()->is('settings/global*')) ? 'active' : ''); ?>"
                 href="<?php echo e(route('settings.global')); ?>"><i class="ti ti-settings"></i><span class="nav-text">Global
                     Settings</span></a></li>
-        <li><a class="nav-link <?php echo e((request()->routeIs('page') || request()->is('page*')) ? 'active' : ''); ?>"
-                href="<?php echo e(route('page')); ?>"><i class="ti ti-layout-dashboard"></i><span class="nav-text">Page
-                    Configurations</span></a></li>
-        <li><a class="nav-link <?php echo e(request()->routeIs('admin.portfolio') ? 'active' : ''); ?>"
-                href="<?php echo e(route('admin.portfolio')); ?>"><i class="ti ti-receipt"></i><span
-                    class="nav-text">Portfolio</span></a>
-        </li>
-        <li><a class="nav-link <?php echo e(request()->routeIs('admin.messages') ? 'active' : ''); ?>"
-                href="<?php echo e(route('admin.messages')); ?>"><i class="ti ti-file-text"></i><span
-                    class="nav-text">Messages</span></a>
-        </li>
-
+        <li><a class="nav-link <?php echo e((request()->routeIs('page', 'admin.page.*', 'admin.skills*', 'admin.awards*', 'admin.counters*', 'admin.services*', 'admin.portfolio*', 'admin.media*', 'admin.messages*', 'admin.chats*', 'admin.categories*', 'admin.posts*', 'admin.tags*') || request()->is('page*', 'skills-manager*', 'award-manager*', 'counter-manager*', 'services-manager*', 'portfolio-manager*', 'media*', 'messages*', 'chats*', 'categories*', 'posts*', 'tags*')) ? 'active' : ''); ?>"
+                href="<?php echo e(route('page')); ?>"><i class="ti ti-layout-dashboard"></i><span class="nav-text">Utility
+                    Widgets</span></a></li>
 
         <li class="px-4 pt-4 pb-2"><small class="nav-text text-muted">Account</small></li>
         <li><a class="nav-link <?php echo e((request()->routeIs('user*') || request()->is('user*')) ? 'active' : ''); ?>"

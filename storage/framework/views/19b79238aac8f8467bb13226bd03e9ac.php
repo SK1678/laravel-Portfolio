@@ -21,42 +21,36 @@
                         class="<?php echo e(request()->routeIs('services') ? 'active' : ''); ?>">Services</a></li>
                 <li><a href="<?php echo e(route('portfolio')); ?>"
                         class="<?php echo e(request()->routeIs('portfolio') ? 'active' : ''); ?>">Portfolio</a></li>
-                <li class="dropdown"><a href="#"><span>Dropdown</span> <i
-                            class="bi bi-chevron-down toggle-dropdown"></i></a>
-                    <ul>
-                        <li><a href="#">Dropdown 1</a></li>
-                        <li class="dropdown"><a href="#"><span>Deep Dropdown</span> <i
+                <li><a href="<?php echo e(route('blogs')); ?>" class="<?php echo e(request()->routeIs('blogs') ? 'active' : ''); ?>">Blog</a>
+                </li>
+                <li><a href="<?php echo e(route('contact')); ?>"
+                        class="<?php echo e(request()->routeIs('contact') ? 'active' : ''); ?>">Contact</a></li>
+
+                <?php if(Auth::check()): ?>
+                    <?php if(Auth::user()->isAdmin()): ?>
+                        <li class="dropdown"><a href="#"><i class="bi bi-person-circle"></i> <i
                                     class="bi bi-chevron-down toggle-dropdown"></i></a>
                             <ul>
-                                <li><a href="#">Deep Dropdown 1</a></li>
-                                <li><a href="#">Deep Dropdown 2</a></li>
-                                <li><a href="#">Deep Dropdown 3</a></li>
-                                <li><a href="#">Deep Dropdown 4</a></li>
-                                <li><a href="#">Deep Dropdown 5</a></li>
+                                <li><a href="<?php echo e(route('dashboard')); ?>">Dashboard</a></li>
+                                <li>
+                                    <a href="<?php echo e(route('logout')); ?>"
+                                        onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                        Logout
+                                    </a>
+                                </li>
                             </ul>
                         </li>
-                        <li><a href="#">Dropdown 2</a></li>
-                        <li><a href="#">Dropdown 3</a></li>
-                        <li><a href="#">Dropdown 4</a></li>
-                    </ul>
-                </li>
-                <li><a href="contact.html">Contact</a></li>
-                <?php if(Auth::check()): ?>
-                    <li class="dropdown"><a href="#"><i class="bi bi-person-circle"></i> <i
-                                class="bi bi-chevron-down toggle-dropdown"></i></a>
-                        <ul>
-                            <li><a href="<?php echo e(route('dashboard')); ?>">Dashboard</a></li>
-                            <li>
-                                <a href="<?php echo e(route('logout')); ?>"
-                                    onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                                    Logout
-                                </a>
-                                <form id="logout-form" action="<?php echo e(route('logout')); ?>" method="POST" class="d-none">
-                                    <?php echo csrf_field(); ?>
-                                </form>
-                            </li>
-                        </ul>
-                    </li>
+                    <?php else: ?>
+                        <li>
+                            <a href="<?php echo e(route('logout')); ?>"
+                                onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                Logout
+                            </a>
+                        </li>
+                    <?php endif; ?>
+                    <form id="logout-form" action="<?php echo e(route('logout')); ?>" method="POST" class="d-none">
+                        <?php echo csrf_field(); ?>
+                    </form>
                 <?php else: ?>
                     <li class="dropdown"><a href="#"><span>Account</span> <i
                                 class="bi bi-chevron-down toggle-dropdown"></i></a>

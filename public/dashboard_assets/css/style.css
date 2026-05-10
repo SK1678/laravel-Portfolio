@@ -182,12 +182,50 @@ body {
   margin-top: 3rem !important;
 }
 
-/* Primary button overrides */
+/* Button Refinements */
+.btn {
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
 .btn-primary {
   background-color: var(--bs-primary);
   border-color: var(--bs-primary);
+  box-shadow: 0 4px 10px rgba(230, 98, 57, 0.2);
 }
+
 .btn-primary:hover {
   background-color: #d15632;
   border-color: #d15632;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 15px rgba(230, 98, 57, 0.3);
 }
+
+.btn-light {
+  background-color: #fff;
+  border: 1px solid var(--bs-gray-200);
+  color: var(--bs-gray-700);
+}
+
+.btn-light:hover {
+  background-color: var(--bs-gray-50);
+  border-color: var(--bs-gray-300);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+}
+
+
+/* Dashboard Layout Utilities */
+.dashboard-container {
+  min-height: calc(100vh - 4rem); /* Viewport height minus padding-top */
+}
+
+.dashboard-content-area {
+  width: 100%;
+}
+
+.dashboard-footer-row {
+  margin-top: auto !important;
+}
+

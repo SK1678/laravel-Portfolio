@@ -21,42 +21,36 @@
                         class="{{ request()->routeIs('services') ? 'active' : '' }}">Services</a></li>
                 <li><a href="{{ route('portfolio') }}"
                         class="{{ request()->routeIs('portfolio') ? 'active' : '' }}">Portfolio</a></li>
-                <li class="dropdown"><a href="#"><span>Dropdown</span> <i
-                            class="bi bi-chevron-down toggle-dropdown"></i></a>
-                    <ul>
-                        <li><a href="#">Dropdown 1</a></li>
-                        <li class="dropdown"><a href="#"><span>Deep Dropdown</span> <i
+                <li><a href="{{ route('blogs') }}" class="{{ request()->routeIs('blogs') ? 'active' : '' }}">Blog</a>
+                </li>
+                <li><a href="{{ route('contact') }}"
+                        class="{{ request()->routeIs('contact') ? 'active' : '' }}">Contact</a></li>
+
+                @if (Auth::check())
+                    @if (Auth::user()->isAdmin())
+                        <li class="dropdown"><a href="#"><i class="bi bi-person-circle"></i> <i
                                     class="bi bi-chevron-down toggle-dropdown"></i></a>
                             <ul>
-                                <li><a href="#">Deep Dropdown 1</a></li>
-                                <li><a href="#">Deep Dropdown 2</a></li>
-                                <li><a href="#">Deep Dropdown 3</a></li>
-                                <li><a href="#">Deep Dropdown 4</a></li>
-                                <li><a href="#">Deep Dropdown 5</a></li>
+                                <li><a href="{{ route('dashboard') }}">Dashboard</a></li>
+                                <li>
+                                    <a href="{{ route('logout') }}"
+                                        onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                        Logout
+                                    </a>
+                                </li>
                             </ul>
                         </li>
-                        <li><a href="#">Dropdown 2</a></li>
-                        <li><a href="#">Dropdown 3</a></li>
-                        <li><a href="#">Dropdown 4</a></li>
-                    </ul>
-                </li>
-                <li><a href="contact.html">Contact</a></li>
-                @if (Auth::check())
-                    <li class="dropdown"><a href="#"><i class="bi bi-person-circle"></i> <i
-                                class="bi bi-chevron-down toggle-dropdown"></i></a>
-                        <ul>
-                            <li><a href="{{ route('dashboard') }}">Dashboard</a></li>
-                            <li>
-                                <a href="{{ route('logout') }}"
-                                    onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                                    Logout
-                                </a>
-                                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-                                    @csrf
-                                </form>
-                            </li>
-                        </ul>
-                    </li>
+                    @else
+                        <li>
+                            <a href="{{ route('logout') }}"
+                                onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                Logout
+                            </a>
+                        </li>
+                    @endif
+                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                        @csrf
+                    </form>
                 @else
                     <li class="dropdown"><a href="#"><span>Account</span> <i
                                 class="bi bi-chevron-down toggle-dropdown"></i></a>

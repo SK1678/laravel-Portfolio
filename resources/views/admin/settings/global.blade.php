@@ -50,24 +50,36 @@
                                     </div>
 
                                     <!-- Logo Image Upload -->
-                                    <div id="logoUploadBox" class="logo-upload-box shadow-sm mb-3 position-relative" style="{{ ($siteSettings->logo_type ?? 'text') == 'text' ? 'display:none' : '' }}">
+                                    <div id="logoUploadBox" class="logo-upload-box shadow-sm mb-3" style="{{ ($siteSettings->logo_type ?? 'text') == 'text' ? 'display:none' : '' }}">
                                         @if(isset($siteSettings) && $siteSettings->logo_image)
                                             <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 m-1 p-0 px-1 remove-logo-btn" style="z-index: 10;" title="Remove Logo">
                                                 <i class="ti ti-x fs-6"></i>
                                             </button>
                                             <input type="hidden" name="remove_logo" id="removeLogoInput" value="0">
                                         @endif
-                                        <label for="logoInput" class="upload-label">
-                                            <div class="preview-area" id="logoPreview">
-                                                @if(isset($siteSettings) && $siteSettings->logo_image)
-                                                    <img src="{{ asset('storage/' . $siteSettings->logo_image) }}" alt="Logo">
-                                                @else
-                                                    <i class="ti ti-photo-up fs-2 text-primary"></i>
-                                                    <span class="d-block text-primary x-small mt-1">Upload Logo</span>
-                                                @endif
-                                            </div>
-                                        </label>
+                                        
+                                        <div class="preview-area" id="logoPreview">
+                                            @if(isset($siteSettings) && $siteSettings->logo_image)
+                                                <img src="{{ asset('storage/' . $siteSettings->logo_image) }}" alt="Logo">
+                                            @else
+                                                <div class="text-center">
+                                                    <i class="ti ti-photo-up fs-2 text-muted"></i>
+                                                    <span class="d-block text-muted x-small mt-1">Logo</span>
+                                                </div>
+                                            @endif
+                                        </div>
+
+                                        <div class="upload-options-overlay">
+                                            <button type="button" class="btn btn-primary" onclick="openMediaManager('logoImagePath', 'logoPreview')">
+                                                <i class="ti ti-library"></i> Select
+                                            </button>
+                                            <label for="logoInput" class="btn btn-secondary mb-0">
+                                                <i class="ti ti-upload"></i> Upload
+                                            </label>
+                                        </div>
+                                        
                                         <input type="file" id="logoInput" name="logo_image" hidden accept="image/*">
+                                        <input type="hidden" name="logo_image_path" id="logoImagePath">
                                     </div>
 
                                     <hr class="my-3 opacity-25">
@@ -76,24 +88,36 @@
                                     <div class="text-start mb-1">
                                         <label class="x-small fw-bold text-muted">Browser Favicon</label>
                                     </div>
-                                    <div class="favicon-upload-box shadow-sm position-relative">
+                                    <div class="favicon-upload-box shadow-sm mx-auto">
                                         @if(isset($siteSettings) && $siteSettings->favicon)
                                             <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 m-0 p-0 px-1 remove-favicon-btn" style="z-index: 10; font-size: 10px;" title="Remove Favicon">
                                                 <i class="ti ti-x"></i>
                                             </button>
                                             <input type="hidden" name="remove_favicon" id="removeFaviconInput" value="0">
                                         @endif
-                                        <label for="faviconInput" class="upload-label">
-                                            <div class="preview-area" id="faviconPreview">
-                                                @if(isset($siteSettings) && $siteSettings->favicon)
-                                                    <img src="{{ asset('storage/' . $siteSettings->favicon) }}" alt="Favicon">
-                                                @else
-                                                    <i class="ti ti-upload fs-4 text-danger"></i>
-                                                    <span class="d-block text-danger x-small">Favicon</span>
-                                                @endif
-                                            </div>
-                                        </label>
-                                        <input type="file" id="faviconInput" hidden accept="image/x-icon,image/png">
+                                        
+                                        <div class="preview-area" id="faviconPreview">
+                                            @if(isset($siteSettings) && $siteSettings->favicon)
+                                                <img src="{{ asset('storage/' . $siteSettings->favicon) }}" alt="Favicon">
+                                            @else
+                                                <div class="text-center">
+                                                    <i class="ti ti-upload fs-4 text-muted"></i>
+                                                    <span class="d-block text-muted" style="font-size: 0.6rem;">Favicon</span>
+                                                </div>
+                                            @endif
+                                        </div>
+
+                                        <div class="upload-options-overlay mini">
+                                            <button type="button" title="Select from Media" onclick="openMediaManager('faviconPath', 'faviconPreview')">
+                                                <i class="ti ti-library"></i>
+                                            </button>
+                                            <label for="faviconInput" title="Upload New" class="mb-0">
+                                                <i class="ti ti-upload"></i>
+                                            </label>
+                                        </div>
+                                        
+                                        <input type="file" id="faviconInput" name="favicon" hidden accept="image/x-icon,image/png">
+                                        <input type="hidden" name="favicon_path" id="faviconPath">
                                     </div>
                                 </div>
                             </div>
@@ -102,12 +126,20 @@
                                     <span class="input-group-text">Site Title</span>
                                     <input type="text" class="form-control" name="site_title" value="{{ $siteSettings->site_title ?? '' }}">
                                 </div>
-                                <div class="input-group-custom">
+                                <div class="input-group-custom mb-2">
                                     <span class="input-group-text">Time Zone</span>
                                     <select class="form-select" name="time_zone">
                                         <option value="UTC +06:00" {{ ($siteSettings->time_zone ?? '') == 'UTC +06:00' ? 'selected' : '' }}>UTC +06:00</option>
                                         <option value="UTC +00:00" {{ ($siteSettings->time_zone ?? '') == 'UTC +00:00' ? 'selected' : '' }}>UTC +00:00</option>
                                     </select>
+                                </div>
+                                <div class="input-group-custom mb-2">
+                                    <span class="input-group-text">Contact Mail</span>
+                                    <input type="email" class="form-control" name="contact_mail" value="{{ $siteSettings->contact_mail ?? '' }}">
+                                </div>
+                                <div class="input-group-custom">
+                                    <span class="input-group-text">Address</span>
+                                    <input type="text" class="form-control" name="address" value="{{ $siteSettings->address ?? '' }}">
                                 </div>
                             </div>
                             <div class="col-md-4">
@@ -115,9 +147,17 @@
                                     <span class="input-group-text">Default Font</span>
                                     <input type="text" class="form-control" name="default_font" value="{{ $siteSettings->default_font ?? '' }}">
                                 </div>
-                                <div class="input-group-custom">
+                                <div class="input-group-custom mb-2">
                                     <span class="input-group-text">Heading Font</span>
                                     <input type="text" class="form-control" name="heading_font" value="{{ $siteSettings->heading_font ?? '' }}">
+                                </div>
+                                <div class="input-group-custom mb-2">
+                                    <span class="input-group-text">Contact No</span>
+                                    <input type="text" class="form-control" name="contact_no" value="{{ $siteSettings->contact_no ?? '' }}">
+                                </div>
+                                <div class="input-group-custom">
+                                    <span class="input-group-text">Map Link</span>
+                                    <input type="text" class="form-control" name="map_link" value="{{ $siteSettings->map_link ?? '' }}">
                                 </div>
                             </div>
 
@@ -483,15 +523,15 @@
         .logo-upload-box,
         .favicon-upload-box {
             width: 100%;
-            height: 100px;
-            border: 2px dashed #EA4335;
+            height: 120px;
+            border: 2px dashed #d1d5db;
             border-radius: 12px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             margin: 0 auto;
             background: #fff;
             position: relative;
@@ -499,14 +539,82 @@
         }
 
         .logo-upload-box {
-            border-color: #4285F4;
-            height: 110px;
+            height: 130px;
         }
 
         .favicon-upload-box {
-            width: 70px;
-            height: 70px;
+            width: 80px;
+            height: 80px;
             border-radius: 10px;
+        }
+
+        .logo-upload-box:hover,
+        .favicon-upload-box:hover {
+            border-color: var(--accent-orange);
+            background: rgba(234, 67, 53, 0.02);
+        }
+
+        .upload-options-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(2px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 5;
+        }
+
+        .logo-upload-box:hover .upload-options-overlay,
+        .favicon-upload-box:hover .upload-options-overlay {
+            opacity: 1;
+        }
+
+        .upload-options-overlay .btn {
+            padding: 5px 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border-radius: 8px;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+        }
+
+        .logo-upload-box:hover .upload-options-overlay .btn {
+            transform: translateY(0);
+        }
+
+        .upload-options-overlay.mini {
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .upload-options-overlay.mini button,
+        .upload-options-overlay.mini label {
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fff;
+            color: #333;
+            border-radius: 50%;
+            border: none;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .upload-options-overlay.mini button:hover,
+        .upload-options-overlay.mini label:hover {
+            background: var(--accent-orange);
+            color: #fff;
+            transform: scale(1.1);
         }
 
         .preview-area {
@@ -903,4 +1011,5 @@
         });
     </script>
     </script>
+    @include('admin.include.media_manager_modal')
 @endsection

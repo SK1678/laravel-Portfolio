@@ -30,6 +30,7 @@
     <link href="<?php echo e(asset('UI/assets/vendor/aos/aos.css')); ?>" rel="stylesheet">
     <link href="<?php echo e(asset('UI/assets/vendor/swiper/swiper-bundle.min.css')); ?>" rel="stylesheet">
     <link href="<?php echo e(asset('UI/assets/vendor/glightbox/css/glightbox.min.css')); ?>" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <!-- Main CSS File -->
